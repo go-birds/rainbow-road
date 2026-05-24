@@ -12,6 +12,7 @@ import java.util.*;
 public class MainActivity extends Activity {
     private GameView gameView;
     private TextView status;
+    private TextView summary;
     private Button drawButton, newButton;
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -26,10 +27,17 @@ public class MainActivity extends Activity {
         status.setTextSize(15);
         status.setTextColor(Color.rgb(91, 59, 140));
         status.setGravity(Gravity.CENTER);
-        status.setPadding(16, 10, 16, 6);
+        status.setPadding(16, 10, 16, 4);
         root.addView(status, new LinearLayout.LayoutParams(-1, -2));
 
-        gameView = new GameView(this, this::setStatus);
+        summary = new TextView(this);
+        summary.setTextSize(12);
+        summary.setTextColor(Color.rgb(130, 95, 190));
+        summary.setGravity(Gravity.CENTER);
+        summary.setPadding(16, 2, 16, 8);
+        root.addView(summary, new LinearLayout.LayoutParams(-1, -2));
+
+        gameView = new GameView(this, this::setStatus, this::setSummary);
         root.addView(gameView, new LinearLayout.LayoutParams(-1, 0, 1));
 
         LinearLayout buttons = new LinearLayout(this);
@@ -52,12 +60,15 @@ public class MainActivity extends Activity {
     }
 
     private void setStatus(String s) { status.setText(s); }
+    private void setSummary(String s) { summary.setText(s); }
 
     interface StatusSink { void set(String s); }
+    interface SummarySink { void set(String s); }
 
     static class GameView extends View {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final StatusSink statusSink;
+        private final SummarySink summarySink;
 
         // Refined rainbow palette
         private final int[] baseColors = {
@@ -75,21 +86,40 @@ public class MainActivity extends Activity {
         private final Path roadPath = new Path();
         private final Path arrowPath = new Path();
 
-        GameView(Context ctx, StatusSink sink) {
+        GameView(Context ctx, StatusSink sink, SummarySink summary) {
             super(ctx);
             statusSink = sink;
+            summarySink = summary;
         }
 
         void newGame() {
             engine.newGame();
             statusSink.set(engine.getLastCard());
+            updateSummary();
             invalidate();
         }
 
         void drawCard() {
             if (engine.isWon()) engine.newGame(); else engine.drawCard();
             statusSink.set(engine.getLastCard());
+            updateSummary();
             invalidate();
+        }
+
+        private void updateSummary() {
+            int pos = engine.getPlayerPosition();
+            int total = engine.getBoard().size();
+            int remaining = total - 1 - pos;
+            int moves = engine.getMoveCount();
+            String s;
+            if (engine.isWon()) {
+                s = "🏰 Castle reached! · " + moves + " draws";
+            } else if (pos == 0) {
+                s = "📍 Start · " + remaining + " spaces to castle · " + moves + " draws";
+            } else {
+                s = "📍 Space " + (pos + 1) + " of " + total + " · " + remaining + " to castle · " + moves + " draws";
+            }
+            summarySink.set(s);
         }
 
         // Maps space index to canvas position: start at bottom, castle at top, sinusoidal winding

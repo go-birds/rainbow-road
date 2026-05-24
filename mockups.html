@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rainbow Trail Quest — UI Mockups</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #18182a;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+    gap: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  h1 { color: #c9aaff; font-size: 20px; letter-spacing: 0.5px; }
+  .subtitle { color: #7766aa; font-size: 13px; }
+  .screens {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 12px;
+  }
+  .mockup-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .screen-label {
+    color: #9988cc;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+  .phone {
+    width: 320px;
+    border-radius: 46px;
+    background: #0e0e18;
+    border: 2px solid #2a2a3e;
+    box-shadow: 0 0 0 7px #171728, 0 28px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+    padding: 16px;
+    position: relative;
+  }
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 16px; left: 50%;
+    transform: translateX(-50%);
+    width: 76px; height: 20px;
+    background: #0e0e18;
+    border-radius: 0 0 14px 14px;
+    z-index: 10;
+  }
+  .screen {
+    width: 100%;
+    border-radius: 32px;
+    overflow: hidden;
+    background: #f2eaff;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-tv {
+    padding: 12px 16px 4px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5B3B8C;
+    line-height: 1.3;
+  }
+  .summary-tv {
+    padding: 2px 16px 8px;
+    text-align: center;
+    font-size: 11px;
+    color: #8260C0;
+  }
+  canvas.board {
+    display: block;
+    width: 100%;
+  }
+  .btn-row {
+    background: #f2eaff;
+    display: flex;
+    padding: 6px 16px 18px;
+    gap: 10px;
+  }
+  .btn {
+    flex: 1;
+    padding: 11px 8px;
+    border-radius: 10px;
+    background: #d5c3f0;
+    color: #4a2d8a;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(100,60,200,0.15);
+  }
+</style>
+</head>
+<body>
+<h1>Rainbow Trail Quest</h1>
+<p class="subtitle">UI Mockups — rendered from the app's drawing logic</p>
+
+<div class="screens">
+  <div class="mockup-wrap">
+    <div class="screen-label">Mid-Game</div>
+    <div class="phone">
+      <div class="screen">
+        <div class="status-tv">Card: Double Sky! 🌟</div>
+        <div class="summary-tv">📍 Space 12 of 45 &nbsp;·&nbsp; 33 to castle &nbsp;·&nbsp; 5 draws</div>
+        <canvas class="board" id="c1"></canvas>
+        <div class="btn-row">
+          <div class="btn">Draw Card</div>
+          <div class="btn">New Board</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="screen-label">Win State</div>
+    <div class="phone">
+      <div class="screen">
+        <div class="status-tv">You reached the Candy Cove Castle in 47 cards! 🎉</div>
+        <div class="summary-tv">🏰 Castle reached! &nbsp;·&nbsp; 47 draws</div>
+        <canvas class="board" id="c2"></canvas>
+        <div class="btn-row">
+          <div class="btn">Draw Card</div>
+          <div class="btn">New Board</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-wrap">
+    <div class="screen-label">New Game</div>
+    <div class="phone">
+      <div class="screen">
+        <div class="status-tv">Welcome to Space Sundae Galaxy 🚀 Draw a card!</div>
+        <div class="summary-tv">📍 Start &nbsp;·&nbsp; 44 spaces to castle &nbsp;·&nbsp; 0 draws</div>
+        <canvas class="board" id="c3"></canvas>
+        <div class="btn-row">
+          <div class="btn">Draw Card</div>
+          <div class="btn">New Board</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FLAMINGO = '#FF4B8D', PAPAYA = '#FF8C42', SAFFRON = '#FFD23F';
+const EMERALD  = '#3BB273', COBALT = '#3D85C8', AMETHYST = '#9B5DE5';
+const PALETTE  = [FLAMINGO, PAPAYA, SAFFRON, EMERALD, COBALT, AMETHYST];
+
+function lighten(hex, f) {
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.min(255,Math.round(r+(255-r)*f))},${Math.min(255,Math.round(g+(255-g)*f))},${Math.min(255,Math.round(b+(255-b)*f))})`;
+}
+
+function spaceCenter(i, n, w, h) {
+  const boardTop = 108, boardBottom = h - 128;
+  const t = i / Math.max(n - 1, 1);
+  return {
+    x: w / 2 + w * 0.32 * Math.sin(t * Math.PI * 4.5),
+    y: boardBottom - t * (boardBottom - boardTop)
+  };
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x+w, y, x+w, y+r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y+h, x, y+h-r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x+r, y, r);
+  ctx.closePath();
+}
+
+function buildBoard(n, placeIndexes) {
+  return Array.from({length: n}, (_, i) => ({
+    colorIndex: i % 6,
+    castle: i === n - 1,
+    shortcut: [Math.floor(n*0.18), Math.floor(n*0.44), Math.floor(n*0.71)].includes(i),
+    sticky:   [Math.floor(n*0.31), Math.floor(n*0.62)].includes(i),
+    special:  placeIndexes.includes(i) || i === 0 || i === n-1
+  }));
+}
+
+function drawBoard(id, playerPos, themeName, themeEmoji, lastCard) {
+  const canvas = document.getElementById(id);
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth;
+  const H = Math.round(W * 1.45);
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const n = 45;
+  const board = buildBoard(n, [11, 23, 38]);
+  const cell  = Math.min(W, H) * 0.033;
+
+  // ── Background ──────────────────────────────────────────────────────────
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0,   '#f2eaff');
+  bg.addColorStop(0.5, '#fdf5ff');
+  bg.addColorStop(1,   '#eaf1ff');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Title ────────────────────────────────────────────────────────────────
+  ctx.textAlign = 'center';
+  ctx.font = `bold ${H * 0.038}px -apple-system, sans-serif`;
+  ctx.fillStyle = '#5B3B8C';
+  ctx.fillText(themeName + '  ' + themeEmoji, W/2, 58);
+  ctx.font = `${H * 0.021}px -apple-system, sans-serif`;
+  ctx.fillStyle = '#AA88D8';
+  ctx.fillText('Every path is a new adventure  ✨', W/2, 84);
+
+  // ── Build road path ──────────────────────────────────────────────────────
+  ctx.beginPath();
+  let prev = spaceCenter(0, n, W, H);
+  ctx.moveTo(prev.x, prev.y);
+  for (let i = 1; i < n; i++) {
+    const curr = spaceCenter(i, n, W, H);
+    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x+curr.x)/2, (prev.y+curr.y)/2);
+    prev = curr;
+  }
+  ctx.lineTo(prev.x, prev.y);
+
+  const roadPath = new Path2D(ctx);
+
+  // shadow
+  ctx.save();
+  ctx.translate(cell*0.15, cell*0.22);
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = cell * 2.8; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.stroke();
+  ctx.restore();
+  // white
+  ctx.strokeStyle = '#fff';   ctx.lineWidth = cell * 2.5; ctx.stroke();
+  // cream
+  ctx.strokeStyle = '#FEF6EC'; ctx.lineWidth = cell * 1.7; ctx.stroke();
+
+  // ── Direction arrows ─────────────────────────────────────────────────────
+  const step = Math.max(3, Math.floor(n/10));
+  for (let i = step; i < n-1; i += step) {
+    const f = spaceCenter(i,   n, W, H);
+    const t = spaceCenter(i+1, n, W, H);
+    const ang = Math.atan2(t.y-f.y, t.x-f.x);
+    const mx = (f.x+t.x)/2, my = (f.y+t.y)/2, sz = cell*0.58;
+    ctx.beginPath();
+    ctx.moveTo(mx+sz*Math.cos(ang),       my+sz*Math.sin(ang));
+    ctx.lineTo(mx+sz*0.52*Math.cos(ang+2.5), my+sz*0.52*Math.sin(ang+2.5));
+    ctx.lineTo(mx+sz*0.52*Math.cos(ang-2.5), my+sz*0.52*Math.sin(ang-2.5));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(176,158,204,0.33)';
+    ctx.fill();
+  }
+
+  // ── Spaces ────────────────────────────────────────────────────────────────
+  for (let i = 0; i < n; i++) {
+    const s = board[i];
+    const p = spaceCenter(i, n, W, H);
+    const col = s.castle ? '#FFCC00' : PALETTE[s.colorIndex];
+    const r   = s.castle ? cell*1.5 : s.special ? cell*1.2 : cell;
+
+    ctx.beginPath(); ctx.arc(p.x+r*0.12, p.y+r*0.16, r, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.fill();
+
+    ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+    ctx.fillStyle = col; ctx.fill();
+
+    ctx.beginPath(); ctx.arc(p.x, p.y, r*0.78, 0, Math.PI*2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+
+    ctx.beginPath(); ctx.arc(p.x, p.y, r*0.66, 0, Math.PI*2);
+    ctx.fillStyle = lighten(col, 0.42); ctx.fill();
+
+    ctx.textAlign = 'center';
+    if (s.castle) {
+      ctx.font = `${r*1.08}px serif`; ctx.fillText('🏰', p.x, p.y+r*0.38);
+    } else if (i === 0) {
+      ctx.font = `${r*0.92}px serif`; ctx.fillText('🌟', p.x, p.y+r*0.33);
+    } else if (s.shortcut) {
+      ctx.font = `${r*0.92}px serif`; ctx.fillText('🌈', p.x, p.y+r*0.33);
+    } else if (s.sticky) {
+      ctx.font = `${r*0.92}px serif`; ctx.fillText('🍯', p.x, p.y+r*0.33);
+    } else if (s.special) {
+      ctx.font = `${r*0.92}px serif`; ctx.fillText('✨', p.x, p.y+r*0.33);
+    }
+  }
+
+  // ── Player token ──────────────────────────────────────────────────────────
+  const pp = spaceCenter(Math.min(playerPos, n-1), n, W, H);
+  const tr  = cell * 1.18;
+  ctx.beginPath(); ctx.arc(pp.x, pp.y, tr+cell*0.60, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(192,144,255,0.16)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(pp.x, pp.y, tr+cell*0.30, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(192,144,255,0.31)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(pp.x, pp.y, tr, 0, Math.PI*2);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.beginPath(); ctx.arc(pp.x, pp.y, tr-cell*0.13, 0, Math.PI*2);
+  ctx.strokeStyle = AMETHYST; ctx.lineWidth = cell*0.30; ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.font = `${tr*1.28}px serif`;
+  ctx.fillText(themeEmoji, pp.x, pp.y+tr*0.45);
+
+  // ── Card preview ──────────────────────────────────────────────────────────
+  const cH = 96, cT = H - cH - 10;
+  roundRect(ctx, 20, cT+5, W-40+4, cH+4, 22);
+  ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.fill();
+  roundRect(ctx, 16, cT, W-32, cH, 22);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  const rbg = ctx.createLinearGradient(16, cT, W-16, cT);
+  [FLAMINGO,PAPAYA,SAFFRON,EMERALD,COBALT,AMETHYST].forEach((c,i,a)=>rbg.addColorStop(i/(a.length-1),c));
+  roundRect(ctx, 16, cT, W-32, cH, 22);
+  ctx.strokeStyle = rbg; ctx.lineWidth = 4; ctx.stroke();
+  const fs = Math.min(H*0.027, 34);
+  ctx.font = `${fs}px -apple-system, sans-serif`;
+  ctx.fillStyle = '#5B3B8C'; ctx.textAlign = 'center';
+  const txt = lastCard.length > 44 ? lastCard.slice(0,44)+'…' : lastCard;
+  ctx.fillText(txt, W/2, cT + cH*0.62);
+}
+
+window.addEventListener('load', () => {
+  drawBoard('c1', 11, 'Unicorn Jellybean Woods', '🦄', 'Card: Double Sky! 🌟');
+  drawBoard('c2', 44, 'Candy Cove',             '🍬', 'You reached the Candy Cove Castle in 47 cards! 🎉');
+  drawBoard('c3',  0, 'Space Sundae Galaxy',    '🚀', 'Welcome to Space Sundae Galaxy 🚀 Draw a card!');
+});
+</script>
+</body>
+</html>

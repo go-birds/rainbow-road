@@ -3,343 +3,1028 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rainbow Trail Quest — UI Mockups</title>
+<title>Rainbow Trail Quest — Board Mockups</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #18182a;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px 60px;
-    gap: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  }
-  h1 { color: #c9aaff; font-size: 20px; letter-spacing: 0.5px; }
-  .subtitle { color: #7766aa; font-size: 13px; }
-  .screens {
-    display: flex;
-    gap: 48px;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
-    margin-top: 12px;
-  }
-  .mockup-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-  }
-  .screen-label {
-    color: #9988cc;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 600;
-  }
-  .phone {
-    width: 320px;
-    border-radius: 46px;
-    background: #0e0e18;
-    border: 2px solid #2a2a3e;
-    box-shadow: 0 0 0 7px #171728, 0 28px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
-    padding: 16px;
-    position: relative;
-  }
-  .phone::before {
-    content: '';
-    position: absolute;
-    top: 16px; left: 50%;
-    transform: translateX(-50%);
-    width: 76px; height: 20px;
-    background: #0e0e18;
-    border-radius: 0 0 14px 14px;
-    z-index: 10;
-  }
-  .screen {
-    width: 100%;
-    border-radius: 32px;
-    overflow: hidden;
-    background: #f2eaff;
-    display: flex;
-    flex-direction: column;
-  }
-  .status-tv {
-    padding: 12px 16px 4px;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: #5B3B8C;
-    line-height: 1.3;
-  }
-  .summary-tv {
-    padding: 2px 16px 8px;
-    text-align: center;
-    font-size: 11px;
-    color: #8260C0;
-  }
-  canvas.board {
-    display: block;
-    width: 100%;
-  }
-  .btn-row {
-    background: #f2eaff;
-    display: flex;
-    padding: 6px 16px 18px;
-    gap: 10px;
-  }
-  .btn {
-    flex: 1;
-    padding: 11px 8px;
-    border-radius: 10px;
-    background: #d5c3f0;
-    color: #4a2d8a;
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
-    box-shadow: 0 2px 6px rgba(100,60,200,0.15);
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0e0e1a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 80px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.page-header {
+  position: sticky; top: 0; z-index: 200;
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px;
+  padding: 18px 20px 14px;
+  background: rgba(14,14,26,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+h1 { color: #c9aaff; font-size: 18px; letter-spacing: 0.4px; }
+.subtitle { color: #5544aa; font-size: 12px; }
+.tab-bar { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
+.tab-btn {
+  padding: 8px 15px; border-radius: 999px;
+  border: 2px solid transparent;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  color: #9988cc; background: #1a1a2e;
+  transition: all 0.15s;
+}
+.tab-btn:hover { color: #fff; border-color: #5544aa; }
+.tab-btn.active {
+  color: #fff; background: #4433aa; border-color: #7766ee;
+  box-shadow: 0 0 16px rgba(100,80,220,0.5);
+}
+
+/* ── Board panel ── */
+.tab-panel { display: none; flex-direction: column; align-items: center; width: 100%; padding-top: 24px; }
+.tab-panel.active { display: flex; }
+.board-title { font-size: 16px; font-weight: 800; letter-spacing: 0.3px; margin-bottom: 4px; }
+.board-desc  { font-size: 12px; max-width: 380px; text-align: center; line-height: 1.6; opacity: 0.75; margin-bottom: 18px; padding: 0 16px; }
+
+/* ── Board frame (no phone hardware, just a styled column) ── */
+.board-frame {
+  width: 100%; max-width: 400px;
+  display: flex; flex-direction: column;
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.07);
+}
+.board-status {
+  padding: 12px 18px 6px; text-align: center;
+  font-size: 13px; font-weight: 600; line-height: 1.4;
+}
+.board-summary {
+  padding: 2px 18px 10px; text-align: center;
+  font-size: 11px; opacity: 0.75;
+}
+canvas.board { display: block; width: 100%; }
+.board-card {
+  padding: 14px 16px 6px; text-align: center;
+  font-size: 13px; font-weight: 600;
+}
+.board-buttons {
+  display: flex; padding: 8px 16px 18px; gap: 10px;
+}
+.btn {
+  flex: 1; padding: 12px 8px; border-radius: 12px;
+  font-size: 13px; font-weight: 700; text-align: center; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
 </style>
 </head>
 <body>
-<h1>Rainbow Trail Quest</h1>
-<p class="subtitle">UI Mockups — rendered from the app's drawing logic</p>
 
-<div class="screens">
-  <div class="mockup-wrap">
-    <div class="screen-label">Mid-Game</div>
-    <div class="phone">
-      <div class="screen">
-        <div class="status-tv">Card: Double Sky! 🌟</div>
-        <div class="summary-tv">📍 Space 12 of 45 &nbsp;·&nbsp; 33 to castle &nbsp;·&nbsp; 5 draws</div>
-        <canvas class="board" id="c1"></canvas>
-        <div class="btn-row">
-          <div class="btn">Draw Card</div>
-          <div class="btn">New Board</div>
-        </div>
-      </div>
+<div class="page-header">
+  <h1>Rainbow Trail Quest</h1>
+  <p class="subtitle">4 Board Design Mockups — scroll down to explore each board</p>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('a')">🍭 Candy Cove</button>
+    <button class="tab-btn"        onclick="switchTab('b')">🦕 Dino Volcano</button>
+    <button class="tab-btn"        onclick="switchTab('c')">🧜 Mermaid Sea</button>
+    <button class="tab-btn"        onclick="switchTab('d')">🦄 Jellybean Tree</button>
+  </div>
+</div>
+
+<!-- ══════════ BOARD A ══════════ -->
+<div class="tab-panel active" id="panel-a">
+  <div class="board-title" style="color:#FF6B9D">🍭 Candy Cove</div>
+  <div class="board-desc" style="color:#FFB3D1">
+    A winding candy road through Peppermint Meadows, Lollipop Forest, and Gumdrop Highlands.
+    Two fork points let you gamble on a shortcut — or play it safe on the scenic route.
+  </div>
+  <div class="board-frame" style="background:#FFF0F7">
+    <div class="board-status" style="color:#B02060">Magic card: go to Lollipop Lagoon! ✨</div>
+    <div class="board-summary" style="color:#CC6090">📍 Space 18 · Fork ahead · 12 draws</div>
+    <canvas class="board" id="ca"></canvas>
+    <div class="board-card" style="color:#B02060; background:#FFF0F7">✨ Magic card: go to Lollipop Lagoon!</div>
+    <div class="board-buttons" style="background:#FFF0F7">
+      <div class="btn" style="background:#FF6B9D;color:#fff">Draw Card</div>
+      <div class="btn" style="background:#FFB3D1;color:#7A1040">New Board</div>
     </div>
   </div>
+</div>
 
-  <div class="mockup-wrap">
-    <div class="screen-label">Win State</div>
-    <div class="phone">
-      <div class="screen">
-        <div class="status-tv">You reached the Candy Cove Castle in 47 cards! 🎉</div>
-        <div class="summary-tv">🏰 Castle reached! &nbsp;·&nbsp; 47 draws</div>
-        <canvas class="board" id="c2"></canvas>
-        <div class="btn-row">
-          <div class="btn">Draw Card</div>
-          <div class="btn">New Board</div>
-        </div>
-      </div>
+<!-- ══════════ BOARD B ══════════ -->
+<div class="tab-panel" id="panel-b">
+  <div class="board-title" style="color:#FF7043">🦕 Dino Sprinkle Park</div>
+  <div class="board-desc" style="color:#FFCC80">
+    Climb a volcanic island from the beach to the summit. Brave the jungle or scale the cliffs —
+    both paths reunite at Fossil Frosting for the final eruption-powered push to the top.
+  </div>
+  <div class="board-frame" style="background:#E8F5E0">
+    <div class="board-status" style="color:#33691E">🦕 Jungle crossroads — choose your path!</div>
+    <div class="board-summary" style="color:#558B2F">🌿 Space 14 · 2 paths open · 10 draws</div>
+    <canvas class="board" id="cb"></canvas>
+    <div class="board-card" style="color:#33691E; background:#E8F5E0">⑂ Choose: 🌿 Jungle Trail or 🏔 Cliff Path?</div>
+    <div class="board-buttons" style="background:#E8F5E0">
+      <div class="btn" style="background:#558B2F;color:#fff">🌿 Jungle</div>
+      <div class="btn" style="background:#E64A19;color:#fff">🏔 Cliff</div>
     </div>
   </div>
+</div>
 
-  <div class="mockup-wrap">
-    <div class="screen-label">New Game</div>
-    <div class="phone">
-      <div class="screen">
-        <div class="status-tv">Welcome to Space Sundae Galaxy 🚀 Draw a card!</div>
-        <div class="summary-tv">📍 Start &nbsp;·&nbsp; 44 spaces to castle &nbsp;·&nbsp; 0 draws</div>
-        <canvas class="board" id="c3"></canvas>
-        <div class="btn-row">
-          <div class="btn">Draw Card</div>
-          <div class="btn">New Board</div>
-        </div>
-      </div>
+<!-- ══════════ BOARD C ══════════ -->
+<div class="tab-panel" id="panel-c">
+  <div class="board-title" style="color:#80DEEA">🧜 Mermaid Sherbet Sea</div>
+  <div class="board-desc" style="color:#B2EBF2">
+    A glowing underwater world — two parallel paths wind through the deep, crossing at Pearl Pop Reef.
+    Then a dramatic 3-way split race to the surface and the Crystal Castle above the waves.
+  </div>
+  <div class="board-frame" style="background:#050D14">
+    <div class="board-status" style="color:#80DEEA">Card: Double Teal! 🌊</div>
+    <div class="board-summary" style="color:#4DD0E1">🌊 Space 9 · Left path · 6 draws</div>
+    <canvas class="board" id="cc"></canvas>
+    <div class="board-card" style="color:#80DEEA; background:#050D14">Card: Double Teal! 🌊</div>
+    <div class="board-buttons" style="background:#071520">
+      <div class="btn" style="background:#006064;color:#80DEEA">Draw Card</div>
+      <div class="btn" style="background:#0A2233;color:#4DD0E1">New Board</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ BOARD D ══════════ -->
+<div class="tab-panel" id="panel-d">
+  <div class="board-title" style="color:#FECA57">🦄 Unicorn Jellybean Woods</div>
+  <div class="board-desc" style="color:#FF9FF3">
+    A magical glowing tree that grows through the night sky. The trunk splits into three branches,
+    each forking again into a cascade of jellybean paths that all converge at the crown-castle.
+  </div>
+  <div class="board-frame" style="background:#060E06">
+    <div class="board-status" style="color:#FECA57">Card: Blueberry! 🫐</div>
+    <div class="board-summary" style="color:#FF9FF3">🌳 Right branch · Space 22 · 14 draws</div>
+    <canvas class="board" id="cd"></canvas>
+    <div class="board-card" style="color:#FECA57; background:#060E06">Card: Blueberry! 🫐</div>
+    <div class="board-buttons" style="background:#060E06">
+      <div class="btn" style="background:#1A3A10;color:#FECA57">Draw Card</div>
+      <div class="btn" style="background:#0F2008;color:#FF9FF3">New Board</div>
     </div>
   </div>
 </div>
 
 <script>
-const FLAMINGO = '#FF4B8D', PAPAYA = '#FF8C42', SAFFRON = '#FFD23F';
-const EMERALD  = '#3BB273', COBALT = '#3D85C8', AMETHYST = '#9B5DE5';
-const PALETTE  = [FLAMINGO, PAPAYA, SAFFRON, EMERALD, COBALT, AMETHYST];
+// ═══════════════════════════════════════════════════
+//  SHARED HELPERS
+// ═══════════════════════════════════════════════════
+const ASPECT = 7.0;
+
+function setup(id) {
+  const cv = document.getElementById(id);
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.parentElement.clientWidth;
+  const H = Math.round(W * ASPECT);
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, W, H, cell: W * 0.042 };
+}
 
 function lighten(hex, f) {
-  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
-  return `rgb(${Math.min(255,Math.round(r+(255-r)*f))},${Math.min(255,Math.round(g+(255-g)*f))},${Math.min(255,Math.round(b+(255-b)*f))})`;
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.min(255,r+(255-r)*f|0)},${Math.min(255,g+(255-g)*f|0)},${Math.min(255,b+(255-b)*f|0)})`;
+}
+function rgba(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
 }
 
-function spaceCenter(i, n, w, h) {
-  const boardTop = 108, boardBottom = h - 128;
-  const t = i / Math.max(n - 1, 1);
-  return {
-    x: w / 2 + w * 0.32 * Math.sin(t * Math.PI * 4.5),
-    y: boardBottom - t * (boardBottom - boardTop)
-  };
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.arcTo(x+w, y, x+w, y+r, r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
-  ctx.lineTo(x + r, y + h);
-  ctx.arcTo(x, y+h, x, y+h-r, r);
-  ctx.lineTo(x, y + r);
-  ctx.arcTo(x, y, x+r, y, r);
-  ctx.closePath();
-}
-
-function buildBoard(n, placeIndexes) {
-  return Array.from({length: n}, (_, i) => ({
-    colorIndex: i % 6,
-    castle: i === n - 1,
-    shortcut: [Math.floor(n*0.18), Math.floor(n*0.44), Math.floor(n*0.71)].includes(i),
-    sticky:   [Math.floor(n*0.31), Math.floor(n*0.62)].includes(i),
-    special:  placeIndexes.includes(i) || i === 0 || i === n-1
-  }));
-}
-
-function drawBoard(id, playerPos, themeName, themeEmoji, lastCard) {
-  const canvas = document.getElementById(id);
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.parentElement.clientWidth;
-  const H = Math.round(W * 1.45);
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  const n = 45;
-  const board = buildBoard(n, [11, 23, 38]);
-  const cell  = Math.min(W, H) * 0.033;
-
-  // ── Background ──────────────────────────────────────────────────────────
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0,   '#f2eaff');
-  bg.addColorStop(0.5, '#fdf5ff');
-  bg.addColorStop(1,   '#eaf1ff');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-
-  // ── Title ────────────────────────────────────────────────────────────────
-  ctx.textAlign = 'center';
-  ctx.font = `bold ${H * 0.038}px -apple-system, sans-serif`;
-  ctx.fillStyle = '#5B3B8C';
-  ctx.fillText(themeName + '  ' + themeEmoji, W/2, 58);
-  ctx.font = `${H * 0.021}px -apple-system, sans-serif`;
-  ctx.fillStyle = '#AA88D8';
-  ctx.fillText('Every path is a new adventure  ✨', W/2, 84);
-
-  // ── Build road path ──────────────────────────────────────────────────────
-  ctx.beginPath();
-  let prev = spaceCenter(0, n, W, H);
-  ctx.moveTo(prev.x, prev.y);
-  for (let i = 1; i < n; i++) {
-    const curr = spaceCenter(i, n, W, H);
-    ctx.quadraticCurveTo(prev.x, prev.y, (prev.x+curr.x)/2, (prev.y+curr.y)/2);
-    prev = curr;
-  }
-  ctx.lineTo(prev.x, prev.y);
-
-  const roadPath = new Path2D(ctx);
-
-  // shadow
-  ctx.save();
-  ctx.translate(cell*0.15, cell*0.22);
-  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-  ctx.lineWidth = cell * 2.8; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  ctx.stroke();
+// Draw layered road between two points
+function road(ctx, x1,y1, x2,y2, cell, col='#FEF6EC', curve=0.12) {
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy)||1;
+  const cx=mx-dy/len*len*curve, cy=my+dx/len*len*curve;
+  const path = ()=>{ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.quadraticCurveTo(cx,cy,x2,y2); };
+  ctx.save(); ctx.translate(cell*0.13,cell*0.2);
+  path(); ctx.strokeStyle='rgba(0,0,0,0.18)'; ctx.lineWidth=cell*3.2; ctx.lineCap='round'; ctx.stroke();
   ctx.restore();
-  // white
-  ctx.strokeStyle = '#fff';   ctx.lineWidth = cell * 2.5; ctx.stroke();
-  // cream
-  ctx.strokeStyle = '#FEF6EC'; ctx.lineWidth = cell * 1.7; ctx.stroke();
+  path(); ctx.strokeStyle='rgba(255,255,255,0.95)'; ctx.lineWidth=cell*2.8; ctx.lineCap='round'; ctx.stroke();
+  path(); ctx.strokeStyle=col; ctx.lineWidth=cell*1.9; ctx.lineCap='round'; ctx.stroke();
+}
 
-  // ── Direction arrows ─────────────────────────────────────────────────────
-  const step = Math.max(3, Math.floor(n/10));
-  for (let i = step; i < n-1; i += step) {
-    const f = spaceCenter(i,   n, W, H);
-    const t = spaceCenter(i+1, n, W, H);
-    const ang = Math.atan2(t.y-f.y, t.x-f.x);
-    const mx = (f.x+t.x)/2, my = (f.y+t.y)/2, sz = cell*0.58;
-    ctx.beginPath();
-    ctx.moveTo(mx+sz*Math.cos(ang),       my+sz*Math.sin(ang));
-    ctx.lineTo(mx+sz*0.52*Math.cos(ang+2.5), my+sz*0.52*Math.sin(ang+2.5));
-    ctx.lineTo(mx+sz*0.52*Math.cos(ang-2.5), my+sz*0.52*Math.sin(ang-2.5));
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(176,158,204,0.33)';
-    ctx.fill();
-  }
+// Dashed shortcut line
+function shortcut(ctx, x1,y1,x2,y2, cell, col) {
+  ctx.save();
+  ctx.setLineDash([cell*1.1,cell*0.6]);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+  ctx.strokeStyle=col; ctx.lineWidth=cell*1.4; ctx.lineCap='round'; ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+  // arrow
+  const ang=Math.atan2(y2-y1,x2-x1);
+  const mx=(x1+x2)/2, my=(y1+y2)/2, sz=cell*0.9;
+  ctx.beginPath();
+  ctx.moveTo(mx+sz*Math.cos(ang), my+sz*Math.sin(ang));
+  ctx.lineTo(mx+sz*0.5*Math.cos(ang+2.4), my+sz*0.5*Math.sin(ang+2.4));
+  ctx.lineTo(mx+sz*0.5*Math.cos(ang-2.4), my+sz*0.5*Math.sin(ang-2.4));
+  ctx.closePath(); ctx.fillStyle=col; ctx.fill();
+}
 
-  // ── Spaces ────────────────────────────────────────────────────────────────
-  for (let i = 0; i < n; i++) {
-    const s = board[i];
-    const p = spaceCenter(i, n, W, H);
-    const col = s.castle ? '#FFCC00' : PALETTE[s.colorIndex];
-    const r   = s.castle ? cell*1.5 : s.special ? cell*1.2 : cell;
+// Draw a space circle
+function space(ctx, x,y, r, col, icon, glow=null) {
+  if(glow){ ctx.save(); ctx.shadowColor=glow; ctx.shadowBlur=r*1.4; ctx.beginPath(); ctx.arc(x,y,r*1.5,0,Math.PI*2); ctx.fillStyle=rgba(glow,0.15); ctx.fill(); ctx.restore(); }
+  ctx.beginPath(); ctx.arc(x+r*0.1,y+r*0.14,r,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+  ctx.beginPath(); ctx.arc(x,y,r*0.76,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(x,y,r*0.62,0,Math.PI*2); ctx.fillStyle=lighten(col,0.42); ctx.fill();
+  if(icon){ ctx.textAlign='center'; ctx.font=`${r*0.9}px serif`; ctx.fillText(icon,x,y+r*0.33); }
+}
 
-    ctx.beginPath(); ctx.arc(p.x+r*0.12, p.y+r*0.16, r, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.fill();
+// Fork sign ring
+function forkRing(ctx, x,y, r, cell) {
+  ctx.save(); ctx.shadowColor='#FFD700'; ctx.shadowBlur=8;
+  ctx.beginPath(); ctx.arc(x,y,r+cell*0.5,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,215,0,0.7)'; ctx.lineWidth=cell*0.28;
+  ctx.setLineDash([cell*0.38,cell*0.22]); ctx.stroke(); ctx.setLineDash([]);
+  ctx.restore();
+}
 
-    ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2);
-    ctx.fillStyle = col; ctx.fill();
+// Player token
+function token(ctx, x,y, cell, emoji, ringCol) {
+  const r=cell*1.3;
+  ctx.save(); ctx.shadowColor=ringCol; ctx.shadowBlur=r;
+  ctx.beginPath(); ctx.arc(x,y,r+cell*0.5,0,Math.PI*2); ctx.fillStyle=rgba(ringCol,0.18); ctx.fill();
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.strokeStyle=ringCol; ctx.lineWidth=cell*0.28; ctx.stroke();
+  ctx.textAlign='center'; ctx.font=`${r*1.25}px serif`; ctx.fillText(emoji,x,y+r*0.44);
+}
 
-    ctx.beginPath(); ctx.arc(p.x, p.y, r*0.78, 0, Math.PI*2);
-    ctx.fillStyle = '#fff'; ctx.fill();
+// Label floating above a space
+function label(ctx, x,y, txt, col, fontSize) {
+  ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=6;
+  ctx.textAlign='center'; ctx.font=`bold ${fontSize}px -apple-system,sans-serif`;
+  ctx.fillStyle=col; ctx.fillText(txt,x,y); ctx.restore();
+}
 
-    ctx.beginPath(); ctx.arc(p.x, p.y, r*0.66, 0, Math.PI*2);
-    ctx.fillStyle = lighten(col, 0.42); ctx.fill();
+// ═══════════════════════════════════════════════════
+//  BOARD A — CANDY COVE  (serpentine candy road)
+// ═══════════════════════════════════════════════════
+function drawA() {
+  const {ctx,W,H,cell} = setup('ca');
+  const PAL = ['#FF6B9D','#FF9F43','#FFD23F','#6BCB77','#74B9FF','#D4AAFF'];
+  const bT=100, bB=H-80, bH=bB-bT;
+  const mg=W*0.11; // horizontal margin
+  const UW=W-mg*2; // usable width
+  const N=7; // spaces per row
+  const sp=UW/(N-1); // x spacing
 
-    ctx.textAlign = 'center';
-    if (s.castle) {
-      ctx.font = `${r*1.08}px serif`; ctx.fillText('🏰', p.x, p.y+r*0.38);
-    } else if (i === 0) {
-      ctx.font = `${r*0.92}px serif`; ctx.fillText('🌟', p.x, p.y+r*0.33);
-    } else if (s.shortcut) {
-      ctx.font = `${r*0.92}px serif`; ctx.fillText('🌈', p.x, p.y+r*0.33);
-    } else if (s.sticky) {
-      ctx.font = `${r*0.92}px serif`; ctx.fillText('🍯', p.x, p.y+r*0.33);
-    } else if (s.special) {
-      ctx.font = `${r*0.92}px serif`; ctx.fillText('✨', p.x, p.y+r*0.33);
+  // Row y positions (6 rows + castle)
+  const ry=[bB, bB-bH*0.165, bB-bH*0.33, bB-bH*0.495, bB-bH*0.66, bB-bH*0.825, bT+30];
+
+  // x positions for row going right or left
+  const xR=i=>mg+i*sp;
+  const xL=i=>mg+(N-1-i)*sp;
+
+  // All main path points [x,y] in order
+  const pts=[];
+  for(let r=0;r<6;r++){
+    for(let s=0;s<N;s++){
+      const x = r%2===0 ? xR(s) : xL(s);
+      pts.push([x, ry[r]]);
     }
   }
+  const castlePt=[W/2, ry[6]];
 
-  // ── Player token ──────────────────────────────────────────────────────────
-  const pp = spaceCenter(Math.min(playerPos, n-1), n, W, H);
-  const tr  = cell * 1.18;
-  ctx.beginPath(); ctx.arc(pp.x, pp.y, tr+cell*0.60, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(192,144,255,0.16)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(pp.x, pp.y, tr+cell*0.30, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(192,144,255,0.31)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(pp.x, pp.y, tr, 0, Math.PI*2);
-  ctx.fillStyle = '#fff'; ctx.fill();
-  ctx.beginPath(); ctx.arc(pp.x, pp.y, tr-cell*0.13, 0, Math.PI*2);
-  ctx.strokeStyle = AMETHYST; ctx.lineWidth = cell*0.30; ctx.stroke();
-  ctx.textAlign = 'center';
-  ctx.font = `${tr*1.28}px serif`;
-  ctx.fillText(themeEmoji, pp.x, pp.y+tr*0.45);
+  // Landmark & special indices
+  const LOLLIPOP_IDX=9;  // row1 s2
+  const GUMDROP_IDX=30;  // row4 s2
+  const PEPPER_IDX=39;   // row5 s4
+  const STICKY=[5,22,35];
+  const SCUTIDX=[3,26];
+  const FORK_IDX=[11,28]; // fork space indices (at end of row connector)
 
-  // ── Card preview ──────────────────────────────────────────────────────────
-  const cH = 96, cT = H - cH - 10;
-  roundRect(ctx, 20, cT+5, W-40+4, cH+4, 22);
-  ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.fill();
-  roundRect(ctx, 16, cT, W-32, cH, 22);
-  ctx.fillStyle = '#fff'; ctx.fill();
-  const rbg = ctx.createLinearGradient(16, cT, W-16, cT);
-  [FLAMINGO,PAPAYA,SAFFRON,EMERALD,COBALT,AMETHYST].forEach((c,i,a)=>rbg.addColorStop(i/(a.length-1),c));
-  roundRect(ctx, 16, cT, W-32, cH, 22);
-  ctx.strokeStyle = rbg; ctx.lineWidth = 4; ctx.stroke();
-  const fs = Math.min(H*0.027, 34);
-  ctx.font = `${fs}px -apple-system, sans-serif`;
-  ctx.fillStyle = '#5B3B8C'; ctx.textAlign = 'center';
-  const txt = lastCard.length > 44 ? lastCard.slice(0,44)+'…' : lastCard;
-  ctx.fillText(txt, W/2, cT + cH*0.62);
+  // ── Background ─────────────────────────────────────────────────────────
+  // Gradient sky
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#FFE4F5'); sky.addColorStop(0.35,'#FFF0FA');
+  sky.addColorStop(0.7,'#FFEEF5'); sky.addColorStop(1,'#FFD6EB');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+
+  // Horizontal terrain bands (drawn as filled rects with rounded tops)
+  const bands=[
+    {y0:ry[5]-bH*0.07, y1:ry[4]+bH*0.07, col:'#FFF5CC', label:'Gumdrop Highlands'},
+    {y0:ry[3]-bH*0.07, y1:ry[2]+bH*0.07, col:'#E8F5E0', label:'Lollipop Forest'},
+    {y0:ry[1]-bH*0.07, y1:ry[0]+60,      col:'#FFF0FA', label:'Peppermint Meadows'},
+  ];
+  bands.forEach(b=>{
+    ctx.fillStyle=b.col+'80';
+    ctx.fillRect(0,b.y0,W,b.y1-b.y0);
+  });
+
+  // Candy cane "trees" in Peppermint Meadows (decorative, left/right margins)
+  function candyCane(cx,cy,h) {
+    ctx.save(); ctx.lineWidth=cell*0.55; ctx.lineCap='round';
+    for(let s=0;s<8;s++){
+      ctx.strokeStyle=s%2===0?'#FF6B9D':'#fff';
+      ctx.beginPath(); ctx.moveTo(cx,cy+s*h/8); ctx.lineTo(cx,cy+(s+1)*h/8); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(cx,cy+h/8,h/8,Math.PI,0); ctx.strokeStyle='#FF6B9D'; ctx.stroke();
+    ctx.restore();
+  }
+  candyCane(W*0.06, ry[0]-80, 70); candyCane(W*0.10, ry[0]-50, 55);
+  candyCane(W*0.90, ry[0]-75, 65); candyCane(W*0.94, ry[0]-45, 50);
+  candyCane(W*0.07, ry[1]+30, 60); candyCane(W*0.93, ry[1]+20, 55);
+
+  // Lollipops in Lollipop Forest
+  function lollipop(cx,cy,r,col){
+    ctx.beginPath(); ctx.moveTo(cx,cy+r); ctx.lineTo(cx,cy+r+r*2.2);
+    ctx.strokeStyle='#8B6914'; ctx.lineWidth=cell*0.32; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx-r*0.25,cy-r*0.2,r*0.38,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.fill();
+  }
+  const lollyCols=['#FF6B9D','#FF9F43','#74B9FF','#6BCB77','#D4AAFF'];
+  [[0.05,0.42],[0.09,0.39],[0.92,0.41],[0.88,0.38],[0.07,0.37],[0.94,0.44]].forEach(([px,py],i)=>{
+    lollipop(W*px, bT+bH*py, cell*0.9, lollyCols[i%5]);
+  });
+
+  // Gumdrop bushes in Gumdrop Highlands
+  function gumdropBush(cx,cy) {
+    const cols=['#FF9F43','#6BCB77','#FF6B9D','#74B9FF','#FFD23F'];
+    for(let i=0;i<6;i++){
+      const a=i/6*Math.PI*2, r=cell*1.1;
+      const gx=cx+r*1.3*Math.cos(a), gy=cy+r*0.7*Math.sin(a);
+      ctx.beginPath(); ctx.arc(gx,gy,r,0,Math.PI*2);
+      ctx.fillStyle=cols[i%5]; ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(cx,cy,cell*0.9,0,Math.PI*2);
+    ctx.fillStyle='#FFD23F'; ctx.fill();
+  }
+  [[0.08,0.64],[0.12,0.67],[0.88,0.63],[0.92,0.67],[0.06,0.70],[0.94,0.71]].forEach(([px,py])=>{
+    gumdropBush(W*px, bT+bH*py);
+  });
+
+  // Rainbow arch near castle
+  const archCY=ry[6]+bH*0.06;
+  for(let i=4;i>=0;i--){
+    const archColors=['#FF6B9D','#FF9F43','#FFD23F','#6BCB77','#74B9FF'];
+    ctx.beginPath(); ctx.arc(W/2, archCY+60, W*0.44+i*cell*0.9, Math.PI, 0);
+    ctx.strokeStyle=archColors[i]; ctx.lineWidth=cell*0.65; ctx.stroke();
+  }
+
+  // Title
+  ctx.textAlign='center'; ctx.font=`bold ${W*0.072}px -apple-system,sans-serif`;
+  ctx.save(); ctx.shadowColor='#FF6B9D'; ctx.shadowBlur=12;
+  ctx.fillStyle='#C0286A'; ctx.fillText('🍭 Candy Cove', W/2, bT-18); ctx.restore();
+
+  // ── Roads ──────────────────────────────────────────────────────────────
+  // Row roads
+  for(let r=0;r<6;r++){
+    for(let s=0;s<N-1;s++){
+      const i=r*N+s, j=i+1;
+      road(ctx, pts[i][0],pts[i][1], pts[j][0],pts[j][1], cell, '#FEF0F8');
+    }
+  }
+  // Row connectors (vertical arcs at edges)
+  for(let r=0;r<5;r++){
+    const lastS=r%2===0?N-1:0; // end of this row
+    const firstS=r%2===0?N-1:0; // start of next row (same x side)
+    const x1=pts[r*N+lastS][0], y1=pts[r*N+lastS][1];
+    const x2=pts[(r+1)*N+0][0];  // first space of next row (same x)
+    const y2=pts[(r+1)*N+0][1];
+    road(ctx, x1,y1, x2,y2, cell, '#FFF0FA', 0.0);
+  }
+  // Final row → castle
+  const lastPt=pts[5*N+N-1]; // last space of row 5 (going left, ends at xL(N-1)=xR(0)=mg)
+  road(ctx, lastPt[0],lastPt[1], castlePt[0],castlePt[1], cell, '#FFD6EB');
+
+  // Shortcut A: row2 end → row3 space 3
+  const scA_from=pts[2*N+N-1]; // end of row 2 (right side)
+  const scA_to  =pts[3*N+3];   // row 3 space 3
+  shortcut(ctx, scA_from[0],scA_from[1], scA_to[0],scA_to[1], cell, 'rgba(255,107,157,0.75)');
+
+  // Shortcut B: row4 space 4 → row5 space 1
+  const scB_from=pts[4*N+4];
+  const scB_to  =pts[5*N+1];
+  shortcut(ctx, scB_from[0],scB_from[1], scB_to[0],scB_to[1], cell, 'rgba(212,170,255,0.75)');
+
+  // Shortcut labels
+  ctx.textAlign='center'; ctx.font=`bold ${cell*0.62}px -apple-system,sans-serif`;
+  ctx.fillStyle='rgba(200,80,140,0.8)';
+  ctx.fillText('✂ shortcut!', (scA_from[0]+scA_to[0])/2+cell*2.5, (scA_from[1]+scA_to[1])/2);
+  ctx.fillStyle='rgba(160,120,230,0.8)';
+  ctx.fillText('✂ shortcut!', (scB_from[0]+scB_to[0])/2+cell*2.5, (scB_from[1]+scB_to[1])/2);
+
+  // ── Spaces ──────────────────────────────────────────────────────────────
+  const CASTLE_R = cell*1.8;
+  const LM_R     = cell*1.45;
+  const NORM_R   = cell*1.05;
+
+  for(let i=0;i<pts.length;i++){
+    const [x,y]=pts[i];
+    const isCastle=false, isStart=i===0;
+    const isLM = [LOLLIPOP_IDX,GUMDROP_IDX,PEPPER_IDX].includes(i);
+    const isSt = STICKY.includes(i);
+    const isSc = SCUTIDX.includes(i);
+    const isFork = FORK_IDX.includes(i);
+    const col = PAL[i%6];
+    const r = isLM ? LM_R : NORM_R;
+    const icon = isStart?'🌟': isFork?'⑂': isLM?['🍭','🍬','🌈'][([LOLLIPOP_IDX,GUMDROP_IDX,PEPPER_IDX].indexOf(i))]: isSt?'🍯': isSc?'🌈':null;
+    if(isFork) forkRing(ctx,x,y,r,cell);
+    space(ctx,x,y,r,col,icon, isLM?col:null);
+    if(isLM){
+      const names=['Lollipop Lagoon','Gumdrop Garden','Peppermint Pier'];
+      const ni=[LOLLIPOP_IDX,GUMDROP_IDX,PEPPER_IDX].indexOf(i);
+      label(ctx,x,y-r-cell*0.85,names[ni],'#C0286A',cell*0.6);
+    }
+  }
+  // Castle
+  ctx.save(); ctx.shadowColor='#FFCC00'; ctx.shadowBlur=CASTLE_R*1.5;
+  space(ctx,castlePt[0],castlePt[1],CASTLE_R,'#FFCC00','🏰','#FFCC00');
+  ctx.restore();
+  label(ctx,castlePt[0],castlePt[1]-CASTLE_R-cell,'Candy Castle','#B8860B',cell*0.72);
+
+  // ── Player token at space 18 ───────────────────────────────────────────
+  const tp=pts[18];
+  token(ctx,tp[0],tp[1],cell,'🍬','#FF6B9D');
+
+  // Terrain band labels
+  ctx.globalAlpha=0.28; ctx.textAlign='right';
+  ctx.font=`bold ${cell*0.75}px -apple-system,sans-serif`;
+  ctx.fillStyle='#6BCB77'; ctx.fillText('Lollipop Forest', W-8, (ry[2]+ry[3])/2+cell*0.3);
+  ctx.fillStyle='#FF9F43'; ctx.fillText('Gumdrop Highlands', W-8, (ry[4]+ry[5])/2+cell*0.3);
+  ctx.fillStyle='#FF6B9D'; ctx.fillText('Peppermint Meadows', W-8, (ry[0]+ry[1])/2+cell*0.3);
+  ctx.globalAlpha=1;
 }
 
-window.addEventListener('load', () => {
-  drawBoard('c1', 11, 'Unicorn Jellybean Woods', '🦄', 'Card: Double Sky! 🌟');
-  drawBoard('c2', 44, 'Candy Cove',             '🍬', 'You reached the Candy Cove Castle in 47 cards! 🎉');
-  drawBoard('c3',  0, 'Space Sundae Galaxy',    '🚀', 'Welcome to Space Sundae Galaxy 🚀 Draw a card!');
-});
+// ═══════════════════════════════════════════════════
+//  BOARD B — DINO VOLCANO TREK
+// ═══════════════════════════════════════════════════
+function drawB() {
+  const {ctx,W,H,cell} = setup('cb');
+  const PAL=['#8BC34A','#FF7043','#FFD54F','#4FC3F7','#CE93D8','#A5D6A7'];
+  const bT=90, bB=H-70, bH=bB-bT;
+
+  function pt(px,py){ return [px*W, bT+py*bH]; }
+
+  // ── Background zones ────────────────────────────────────────────────────
+  // Full bg: sky gradient
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#BF360C'); sky.addColorStop(0.2,'#E8C8A0');
+  sky.addColorStop(0.55,'#87CEEB'); sky.addColorStop(0.8,'#A8D8F0');
+  sky.addColorStop(1,'#C8E8F8');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+
+  // Ocean (bottom)
+  const ocean=ctx.createLinearGradient(0,bT+bH*0.82,0,H);
+  ocean.addColorStop(0,'rgba(30,136,229,0)'); ocean.addColorStop(1,'rgba(30,136,229,0.85)');
+  ctx.fillStyle=ocean; ctx.fillRect(0,bT+bH*0.82,W,H-(bT+bH*0.82));
+
+  // Island landmass
+  ctx.beginPath();
+  ctx.moveTo(W*0.5, bT+bH*0.04);
+  ctx.bezierCurveTo(W*0.72,bT+bH*0.05, W*0.88,bT+bH*0.12, W*0.95,bT+bH*0.25);
+  ctx.bezierCurveTo(W,bT+bH*0.4, W*0.96,bT+bH*0.58, W*0.9,bT+bH*0.72);
+  ctx.bezierCurveTo(W*0.84,bT+bH*0.84, W*0.7,bT+bH*0.88, W*0.5,bT+bH*0.9);
+  ctx.bezierCurveTo(W*0.3,bT+bH*0.88, W*0.16,bT+bH*0.84, W*0.1,bT+bH*0.72);
+  ctx.bezierCurveTo(W*0.04,bT+bH*0.58, W*0,bT+bH*0.4, W*0.05,bT+bH*0.25);
+  ctx.bezierCurveTo(W*0.12,bT+bH*0.12, W*0.28,bT+bH*0.05, W*0.5,bT+bH*0.04);
+  const islandGrad=ctx.createRadialGradient(W/2,bT+bH*0.5,0,W/2,bT+bH*0.5,W*0.55);
+  islandGrad.addColorStop(0,'#5D8A3C'); islandGrad.addColorStop(0.4,'#7AAD50');
+  islandGrad.addColorStop(0.75,'#A8C87A'); islandGrad.addColorStop(1,'#D4A44C');
+  ctx.fillStyle=islandGrad; ctx.fill();
+
+  // Sandy beach ring
+  ctx.beginPath(); ctx.arc(W/2,bT+bH*0.88,W*0.32,0,Math.PI*2);
+  ctx.strokeStyle='rgba(220,180,80,0.5)'; ctx.lineWidth=cell*1.8; ctx.stroke();
+
+  // Ocean waves
+  for(let i=0;i<4;i++){
+    const wy=bT+bH*(0.91+i*0.024);
+    ctx.beginPath(); ctx.moveTo(0,wy);
+    for(let x=0;x<W;x+=4) ctx.lineTo(x, wy+Math.sin(x/18+i)*3);
+    ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.stroke();
+  }
+
+  // Jungle trees (lower island)
+  function jungle(cx,cy,h,col='#4A8A28'){
+    ctx.beginPath(); ctx.moveTo(cx,cy-h); ctx.lineTo(cx-h*0.55,cy); ctx.lineTo(cx+h*0.55,cy); ctx.closePath();
+    ctx.fillStyle=col; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx,cy-h*1.35); ctx.lineTo(cx-h*0.42,cy-h*0.45); ctx.lineTo(cx+h*0.42,cy-h*0.45); ctx.closePath();
+    ctx.fillStyle=lighten(col,0.2); ctx.fill();
+  }
+  [[0.07,0.68],[0.13,0.72],[0.04,0.76],[0.93,0.67],[0.88,0.73],[0.96,0.76],[0.18,0.65],[0.82,0.65],[0.10,0.62],[0.90,0.62]].forEach(([px,py])=>{
+    jungle(W*px,bT+bH*py,cell*2.8,['#2E7D20','#388E2A','#43A034'][Math.floor(px*3)%3]);
+  });
+
+  // Rocky cliffs (mid)
+  function rock(cx,cy,s){
+    ctx.beginPath(); ctx.moveTo(cx-s,cy); ctx.lineTo(cx-s*0.6,cy-s*1.1); ctx.lineTo(cx,cy-s*1.4);
+    ctx.lineTo(cx+s*0.5,cy-s*0.9); ctx.lineTo(cx+s,cy); ctx.closePath();
+    ctx.fillStyle='#78909C'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx,cy-s*1.4); ctx.lineTo(cx+s*0.5,cy-s*0.9); ctx.lineTo(cx+s,cy);
+    ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fill();
+  }
+  [[0.06,0.45],[0.12,0.42],[0.04,0.48],[0.94,0.44],[0.88,0.41],[0.96,0.47]].forEach(([px,py])=>{
+    rock(W*px,bT+bH*py,cell*2.0);
+  });
+
+  // Volcano cone
+  const volTipX=W/2, volTipY=bT+bH*0.03;
+  ctx.beginPath(); ctx.moveTo(volTipX,volTipY);
+  ctx.lineTo(W*0.3,bT+bH*0.18); ctx.lineTo(W*0.7,bT+bH*0.18); ctx.closePath();
+  const vg=ctx.createLinearGradient(W*0.3,0,W*0.7,0);
+  vg.addColorStop(0,'#BF360C'); vg.addColorStop(0.5,'#D84315'); vg.addColorStop(1,'#BF360C');
+  ctx.fillStyle=vg; ctx.fill();
+  // Lava glow
+  ctx.save(); ctx.shadowColor='#FF6D00'; ctx.shadowBlur=30;
+  ctx.beginPath(); ctx.arc(volTipX,volTipY+8,cell*1.4,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,100,0,0.55)'; ctx.fill(); ctx.restore();
+  // Smoke
+  for(let s=0;s<4;s++){
+    ctx.beginPath(); ctx.arc(volTipX+(s-1.5)*cell*1.2,volTipY-cell*(s+1)*1.2,cell*(0.8+s*0.25),0,Math.PI*2);
+    ctx.fillStyle=`rgba(120,120,120,${0.18-s*0.03})`; ctx.fill();
+  }
+
+  // Dino footprints
+  function footprint(fx,fy,ang){
+    ctx.save(); ctx.translate(fx,fy); ctx.rotate(ang); ctx.globalAlpha=0.22;
+    [[-3,-5],[3,-4],[0,0],[4,3],[-4,4]].forEach(([ox,oy])=>{
+      ctx.beginPath(); ctx.ellipse(ox*1.4,oy*1.4,2.5,4,0.3,0,Math.PI*2);
+      ctx.fillStyle='#4E342E'; ctx.fill();
+    });
+    ctx.restore();
+  }
+  for(let i=0;i<12;i++) footprint(W*(0.2+i*0.05), bT+bH*(0.55+Math.sin(i)*0.04), Math.PI*0.1);
+
+  // Title
+  ctx.textAlign='center'; ctx.save(); ctx.shadowColor='#FF7043'; ctx.shadowBlur=10;
+  ctx.font=`bold ${W*0.068}px -apple-system,sans-serif`;
+  ctx.fillStyle='#BF360C'; ctx.fillText('🦕 Dino Sprinkle Park', W/2, bT-16); ctx.restore();
+
+  // ── Path layout: Start at beach → crossroads → L/R → summit → castle ───
+  const start   = pt(0.50,0.91);
+  const pre1    = pt(0.50,0.84);
+  const pre2    = pt(0.50,0.77);
+  const cross   = pt(0.50,0.70); // FORK
+
+  // Left jungle trail
+  const LJ=[pt(0.37,0.63),pt(0.26,0.57),pt(0.18,0.50),pt(0.14,0.43),pt(0.16,0.36),pt(0.22,0.29),pt(0.30,0.23)];
+  // Cave shortcut: LJ[2]→LJ[5] (skip LJ[3],LJ[4])
+  const caveFrom=LJ[2], caveTo=LJ[5];
+
+  // Right cliff trail
+  const RC=[pt(0.63,0.63),pt(0.74,0.57),pt(0.82,0.50),pt(0.86,0.43),pt(0.84,0.36),pt(0.78,0.29),pt(0.70,0.23)];
+
+  const summit   = pt(0.50,0.20); // Fossil Frosting
+  const push1    = pt(0.50,0.13);
+  const push2    = pt(0.50,0.07);
+  const castle   = pt(0.50,0.02);
+
+  // Roads
+  [[start,pre1],[pre1,pre2],[pre2,cross]].forEach(([a,b])=>road(ctx,a[0],a[1],b[0],b[1],cell,'#E8F5E0'));
+  let prev=cross;
+  LJ.forEach(p=>{road(ctx,prev[0],prev[1],p[0],p[1],cell,'#C8E6A0',0.12); prev=p;});
+  road(ctx,LJ[LJ.length-1][0],LJ[LJ.length-1][1],summit[0],summit[1],cell,'#DCEDC8');
+  prev=cross;
+  RC.forEach(p=>{road(ctx,prev[0],prev[1],p[0],p[1],cell,'#FFE0B2',0.12); prev=p;});
+  road(ctx,RC[RC.length-1][0],RC[RC.length-1][1],summit[0],summit[1],cell,'#FFCC80');
+  [[summit,push1],[push1,push2],[push2,castle]].forEach(([a,b])=>road(ctx,a[0],a[1],b[0],b[1],cell,'#FFCCBC'));
+
+  // Cave shortcut
+  shortcut(ctx,caveFrom[0],caveFrom[1],caveTo[0],caveTo[1],cell,'rgba(121,85,72,0.72)');
+  label(ctx,(caveFrom[0]+caveTo[0])/2+cell*2,(caveFrom[1]+caveTo[1])/2,'🕳 cave shortcut','rgba(90,50,20,0.85)',cell*0.62);
+
+  // Branch labels
+  forkRing(ctx,cross[0],cross[1],cell*1.2,cell);
+  label(ctx,cross[0]-W*0.14,cross[1]+cell*3.2,'🌿 Jungle Trail','rgba(46,125,50,0.9)',cell*0.7);
+  label(ctx,cross[0]+W*0.14,cross[1]+cell*3.2,'🏔 Cliff Path','rgba(230,74,25,0.9)',cell*0.7);
+
+  // Spaces
+  const allSpots=[start,pre1,pre2,cross,...LJ,...RC,summit,push1,push2];
+  [[start,'🌟',PAL[3],NORM_R=cell*1.15],[pre1,null,PAL[0],cell],[pre2,null,PAL[1],cell],[cross,'⑂',PAL[2],cell*1.2]].forEach(([p,ic,co,r])=>space(ctx,p[0],p[1],r,co,ic));
+  LJ.forEach((p,i)=>{
+    const co=PAL[i%6];
+    const ic=i===0?null:i===2?'🦕':i===4?'🍯':null;
+    space(ctx,p[0],p[1],cell,co,ic);
+  });
+  // T-Rex Taffy landmark
+  const trtPos=LJ[3];
+  space(ctx,trtPos[0],trtPos[1],cell*1.4,PAL[1],'🦕',PAL[1]);
+  label(ctx,trtPos[0]-cell*1.5,trtPos[1]-cell*2,'T-Rex Taffy','#E64A19',cell*0.65);
+
+  RC.forEach((p,i)=>{
+    const co=PAL[(i+3)%6];
+    const ic=i===3?'🌋':i===5?'🍯':null;
+    const r=i===3?cell*1.4:cell;
+    space(ctx,p[0],p[1],r,co,ic, i===3?PAL[1]:null);
+  });
+  label(ctx,RC[3][0]+cell*1.5,RC[3][1]-cell*2,'Volcano Vanilla','#E64A19',cell*0.65);
+
+  // Fossil Frosting summit
+  space(ctx,summit[0],summit[1],cell*1.55,PAL[2],'🦴',PAL[2]);
+  label(ctx,summit[0],summit[1]-cell*2.2,'Fossil Frosting','#F57F17',cell*0.7);
+  forkRing(ctx,summit[0],summit[1],cell*1.55,cell);
+
+  space(ctx,push1[0],push1[1],cell,PAL[4],null);
+  space(ctx,push2[0],push2[1],cell,PAL[0],null);
+
+  // Castle
+  ctx.save(); ctx.shadowColor='#FF6D00'; ctx.shadowBlur=cell*2.5;
+  space(ctx,castle[0],castle[1],cell*2.0,'#FFCC00','🏰','#FFCC00');
+  ctx.restore();
+  label(ctx,castle[0],castle[1]-cell*2.8,'Volcano Castle','#BF360C',cell*0.75);
+
+  // Player token at cross
+  token(ctx,cross[0],cross[1],cell,'🦕','#8BC34A');
+
+  var NORM_R; // just to make the destructure above not error
+}
+
+// ═══════════════════════════════════════════════════
+//  BOARD C — MERMAID SHERBET SEA
+// ═══════════════════════════════════════════════════
+function drawC() {
+  const {ctx,W,H,cell} = setup('cc');
+  const PAL=['#00BCD4','#FF80AB','#B39DDB','#80DEEA','#FFCC02','#F48FB1'];
+  const bT=90, bB=H-70, bH=bB-bT;
+  function pt(px,py){ return [px*W, bT+py*bH]; }
+
+  // ── Background: deep ocean ──────────────────────────────────────────────
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#E0F7FA'); bg.addColorStop(0.08,'#80DEEA');
+  bg.addColorStop(0.2,'#006064'); bg.addColorStop(0.5,'#002233');
+  bg.addColorStop(0.8,'#001122'); bg.addColorStop(1,'#000A12');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // Surface shimmer at very top
+  const surf=ctx.createLinearGradient(0,0,0,bT+bH*0.07);
+  surf.addColorStop(0,'rgba(255,255,255,0.6)'); surf.addColorStop(1,'rgba(0,188,212,0)');
+  ctx.fillStyle=surf; ctx.fillRect(0,0,W,bT+bH*0.07);
+
+  // Light rays from surface
+  ctx.save(); ctx.globalAlpha=0.06;
+  for(let i=0;i<7;i++){
+    const x=W*(0.15+i*0.12);
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x-W*0.08,H*0.4); ctx.lineTo(x+W*0.08,H*0.4); ctx.closePath();
+    ctx.fillStyle='#80DEEA'; ctx.fill();
+  }
+  ctx.restore();
+
+  // Bubbles (fixed positions)
+  const bubblePos=[[0.08,0.3],[0.92,0.35],[0.15,0.55],[0.85,0.6],[0.05,0.72],[0.95,0.78],[0.20,0.85],[0.80,0.90],[0.12,0.42],[0.88,0.47],[0.25,0.65],[0.75,0.68]];
+  bubblePos.forEach(([px,py])=>{
+    const bx=W*px, by=bT+bH*py, br=cell*(0.25+px*0.3);
+    ctx.beginPath(); ctx.arc(bx,by,br,0,Math.PI*2);
+    ctx.strokeStyle='rgba(128,222,234,0.35)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(bx-br*0.3,by-br*0.3,br*0.25,0,Math.PI*2);
+    ctx.fillStyle='rgba(200,240,255,0.4)'; ctx.fill();
+  });
+
+  // Seafloor (bottom)
+  ctx.fillStyle='rgba(160,120,60,0.4)';
+  ctx.fillRect(0,bT+bH*0.9,W,bH*0.1+70);
+  // Coral
+  function coral(cx,cy,h,col){
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=cell*0.4; ctx.lineCap='round';
+    function branch(x,y,l,ang,d){
+      if(d>4||l<2) return;
+      const ex=x+Math.cos(ang)*l, ey=y-Math.sin(ang)*l; // y decreases = up
+      // Clamp to canvas bounds
+      if(ex<0||ex>W||ey<0||ey>H) return;
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(ex,ey); ctx.stroke();
+      branch(ex,ey,l*0.68,ang+0.4,d+1);
+      branch(ex,ey,l*0.68,ang-0.4,d+1);
+    }
+    branch(cx,cy,h,Math.PI/2,0);
+    ctx.restore();
+  }
+  [['#FF80AB',0.08],[PAL[0],0.18],[PAL[4],0.30],[PAL[5],0.85],[PAL[0],0.92],[PAL[2],0.75]].forEach(([col,px],i)=>{
+    coral(W*px, bT+bH*0.93, cell*2.8+i*cell*0.4, col);
+  });
+
+  // Kelp forests (mid-low)
+  function kelp(cx,yBase,h){
+    for(let s=0;s<Math.round(h/12);s++){
+      const t=s/Math.round(h/12), sway=Math.sin(t*Math.PI*2.5)*W*0.03;
+      ctx.beginPath(); ctx.arc(cx+sway,yBase-t*h,cell*0.22,0,Math.PI*2);
+      ctx.fillStyle=`rgba(27,94,32,${0.5+t*0.3})`; ctx.fill();
+    }
+  }
+  [0.04,0.08,0.12,0.88,0.92,0.96,0.19,0.81].forEach(px=>kelp(W*px,bT+bH*0.92,bH*0.28));
+
+  // Jellyfish (upper-mid zone)
+  function jelly(cx,cy,r,col){
+    ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=r*1.5;
+    ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,0); ctx.fillStyle=rgba(col,0.55); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,r*0.6,Math.PI,0); ctx.fillStyle=rgba(col,0.35); ctx.fill();
+    for(let t=0;t<5;t++){
+      const tx=cx+(t-2)*r*0.35;
+      ctx.beginPath(); ctx.moveTo(tx,cy);
+      ctx.bezierCurveTo(tx-r*0.1,cy+r*0.8, tx+r*0.1,cy+r*1.2, tx,cy+r*1.6);
+      ctx.strokeStyle=rgba(col,0.35); ctx.lineWidth=1.5; ctx.stroke();
+    }
+    ctx.restore();
+  }
+  [[0.12,0.38,'#FF80AB'],[0.88,0.42,'#B39DDB'],[0.06,0.52,'#80DEEA'],[0.94,0.55,'#FFCC02']].forEach(([px,py,col])=>{
+    jelly(W*px,bT+bH*py,cell*1.4,col);
+  });
+
+  // Stars / bioluminescent particles
+  ctx.save();
+  const starPos=[[0.22,0.60],[0.78,0.65],[0.35,0.75],[0.65,0.80],[0.50,0.70],[0.15,0.78],[0.85,0.73],[0.40,0.88],[0.60,0.85]];
+  starPos.forEach(([px,py])=>{
+    const sx=W*px, sy=bT+bH*py;
+    ctx.beginPath(); ctx.arc(sx,sy,1.5,0,Math.PI*2);
+    ctx.fillStyle='rgba(128,222,234,0.7)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(sx,sy,4,0,Math.PI*2);
+    ctx.fillStyle='rgba(128,222,234,0.1)'; ctx.fill();
+  });
+  ctx.restore();
+
+  // Title
+  ctx.textAlign='center'; ctx.save(); ctx.shadowColor='#00BCD4'; ctx.shadowBlur=14;
+  ctx.font=`bold ${W*0.062}px -apple-system,sans-serif`;
+  ctx.fillStyle='#E0F7FA'; ctx.fillText('🧜 Mermaid Sherbet Sea', W/2, bT-16); ctx.restore();
+
+  // ── Constellation path layout ───────────────────────────────────────────
+  // Start → early fork → L cluster → Pearl Reef → 3-way → castle
+  const start  = pt(0.50,0.94);
+  const pre    = pt(0.50,0.88);
+  const forkL  = pt(0.28,0.82);
+  const forkR  = pt(0.72,0.82);
+
+  // Left cluster (arc of spaces going up-left then curving right)
+  const LC=[pt(0.18,0.75),pt(0.10,0.66),pt(0.12,0.57),pt(0.19,0.49),pt(0.28,0.43)];
+  // Right cluster
+  const RC=[pt(0.82,0.75),pt(0.90,0.66),pt(0.88,0.57),pt(0.81,0.49),pt(0.72,0.43)];
+
+  const reef=pt(0.50,0.38); // Pearl Pop Reef — reunion + 3-way fork
+
+  // 3-way upper paths
+  const UL=[pt(0.22,0.31),pt(0.14,0.22),pt(0.20,0.13)];
+  const UC=[pt(0.50,0.29),pt(0.50,0.20),pt(0.50,0.12)];
+  const UR=[pt(0.78,0.31),pt(0.86,0.22),pt(0.80,0.13)];
+
+  const topJoin=pt(0.50,0.07);
+  const castle =pt(0.50,0.02);
+
+  // Glow road helper for this board
+  function glowRoad(p1,p2,col,w=cell*1.5){
+    ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=12;
+    const mx=(p1[0]+p2[0])/2, my=(p1[1]+p2[1])/2;
+    const dx=p2[0]-p1[0], dy=p2[1]-p1[1], len=Math.hypot(dx,dy)||1;
+    const cx_=mx-dy/len*len*0.07, cy_=my+dx/len*len*0.07;
+    ctx.setLineDash([w*1.4,w*0.8]);
+    ctx.beginPath(); ctx.moveTo(p1[0],p1[1]); ctx.quadraticCurveTo(cx_,cy_,p2[0],p2[1]);
+    ctx.strokeStyle=rgba(col,0.8); ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // Roads
+  glowRoad(start,pre,PAL[4]);
+  glowRoad(pre,forkL,PAL[0]); glowRoad(pre,forkR,PAL[1]);
+  let prev=forkL; LC.forEach(p=>{glowRoad(prev,p,PAL[2]); prev=p;}); glowRoad(LC[LC.length-1],reef,PAL[0]);
+  prev=forkR; RC.forEach(p=>{glowRoad(prev,p,PAL[1]); prev=p;}); glowRoad(RC[RC.length-1],reef,PAL[1]);
+  glowRoad(reef,UL[0],PAL[2]); UL.forEach((p,i)=>{ if(i>0)glowRoad(UL[i-1],p,PAL[2]); }); glowRoad(UL[UL.length-1],topJoin,PAL[2]);
+  glowRoad(reef,UC[0],PAL[4]); UC.forEach((p,i)=>{ if(i>0)glowRoad(UC[i-1],p,PAL[4]); }); glowRoad(UC[UC.length-1],topJoin,PAL[4]);
+  glowRoad(reef,UR[0],PAL[1]); UR.forEach((p,i)=>{ if(i>0)glowRoad(UR[i-1],p,PAL[1]); }); glowRoad(UR[UR.length-1],topJoin,PAL[1]);
+  glowRoad(topJoin,castle,PAL[4],cell*2);
+
+  // Spaces
+  function gSpace(p,col,ic,r=cell,lm=false){
+    ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=lm?20:10;
+    space(ctx,p[0],p[1],r,col,ic,col); ctx.restore();
+  }
+  gSpace(start,PAL[4],'🌟',cell*1.2,true);
+  gSpace(pre,PAL[0],null,cell*0.9);
+  // Fork arrows
+  [forkL,forkR].forEach((p,i)=>{
+    gSpace(p,PAL[i],null,cell);
+    ctx.textAlign='center'; ctx.font=`${cell*0.6}px serif`;
+    ctx.fillStyle='rgba(180,240,255,0.7)'; ctx.fillText('⑂',p[0],p[1]-cell*1.4);
+  });
+  LC.forEach((p,i)=>gSpace(p,PAL[i%3],i===2?'🪸':i===4?'🍯':null, i===2?cell*1.3:cell,i===2));
+  RC.forEach((p,i)=>gSpace(p,PAL[(i+3)%6],i===2?'🫧':i===3?'🍯':null, i===2?cell*1.3:cell,i===2));
+  label(ctx,LC[2][0]-cell*0.5,LC[2][1]-cell*2.1,'Coral Cupcake',PAL[3],cell*0.62);
+  label(ctx,RC[2][0]+cell*0.5,RC[2][1]-cell*2.1,'Bubblegum Bay',PAL[5],cell*0.62);
+
+  // Reef
+  ctx.save(); ctx.shadowColor=PAL[4]; ctx.shadowBlur=20;
+  space(ctx,reef[0],reef[1],cell*1.7,PAL[4],'🐚',PAL[4]); ctx.restore();
+  forkRing(ctx,reef[0],reef[1],cell*1.7,cell);
+  label(ctx,reef[0],reef[1]-cell*2.6,'Pearl Pop Reef',PAL[4],cell*0.7);
+  ctx.textAlign='center'; ctx.font=`${cell*0.55}px serif`;
+  ctx.fillStyle='rgba(200,240,255,0.6)'; ctx.fillText('3-way split ⑂',reef[0],reef[1]-cell*3.6);
+
+  UL.forEach((p,i)=>gSpace(p,PAL[2],i===1?'🌈':null,cell));
+  UC.forEach((p,i)=>gSpace(p,PAL[4],i===1?'✨':null,cell));
+  UR.forEach((p,i)=>gSpace(p,PAL[1],i===1?'🌊':null,cell));
+  gSpace(topJoin,PAL[3],null,cell*0.85);
+
+  // Castle (pearl)
+  ctx.save(); ctx.shadowColor='#FFCC02'; ctx.shadowBlur=cell*3;
+  space(ctx,castle[0],castle[1],cell*2.0,'#FFCC02','🏰','#FFCC02'); ctx.restore();
+  label(ctx,castle[0],castle[1]-cell*2.8,'Crystal Castle',PAL[4],cell*0.72);
+
+  // Player token in LC[1]
+  token(ctx,LC[1][0],LC[1][1],cell,'🧜',PAL[0]);
+}
+
+// ═══════════════════════════════════════════════════
+//  BOARD D — UNICORN JELLYBEAN TREE
+// ═══════════════════════════════════════════════════
+function drawD() {
+  const {ctx,W,H,cell} = setup('cd');
+  const PAL=['#FF6B6B','#FF9F43','#FECA57','#48DBFB','#FF9FF3','#54A0FF'];
+  const bT=90, bB=H-70, bH=bB-bT;
+  function pt(px,py){ return [px*W, bT+py*bH]; }
+
+  // ── Background: night forest ────────────────────────────────────────────
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#0A1A28'); bg.addColorStop(0.15,'#0D2010');
+  bg.addColorStop(0.6,'#0D1F0D'); bg.addColorStop(1,'#060E06');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // Stars in top section
+  const starXY=[[0.08,0.03],[0.22,0.01],[0.55,0.04],[0.78,0.02],[0.92,0.05],[0.35,0.06],[0.65,0.07],[0.15,0.08],[0.85,0.09],[0.45,0.05],[0.30,0.03],[0.70,0.04],[0.12,0.10],[0.88,0.11],[0.50,0.09]];
+  starXY.forEach(([px,py])=>{
+    const sx=W*px, sy=bT+bH*py;
+    ctx.save(); ctx.shadowColor='rgba(255,250,200,0.8)'; ctx.shadowBlur=4;
+    ctx.beginPath(); ctx.arc(sx,sy,1.4,0,Math.PI*2); ctx.fillStyle='rgba(255,248,200,0.85)'; ctx.fill();
+    ctx.restore();
+  });
+
+  // Moon glow
+  ctx.save(); ctx.shadowColor='#FFFDE7'; ctx.shadowBlur=30;
+  ctx.beginPath(); ctx.arc(W*0.85,bT+bH*0.04,cell*1.4,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,253,200,0.6)'; ctx.fill(); ctx.restore();
+
+  // Forest floor
+  const floor=ctx.createLinearGradient(0,bT+bH*0.88,0,H);
+  floor.addColorStop(0,'rgba(10,30,8,0)'); floor.addColorStop(1,'rgba(10,30,8,0.9)');
+  ctx.fillStyle=floor; ctx.fillRect(0,bT+bH*0.88,W,H-(bT+bH*0.88));
+  // Ground mushrooms
+  function mushroom(mx,my,r,col){
+    ctx.beginPath(); ctx.rect(mx-r*0.3,my-r*0.8,r*0.6,r*0.8); ctx.fillStyle='#BDBDBD'; ctx.fill();
+    ctx.beginPath(); ctx.arc(mx,my-r*0.9,r,Math.PI,0); ctx.fillStyle=col; ctx.fill();
+    ctx.beginPath(); ctx.arc(mx-r*0.3,my-r*0.9,r*0.2,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.fill();
+  }
+  [[0.08,0.94,'#E53935'],[0.15,0.96,'#8E24AA'],[0.85,0.95,'#E53935'],[0.92,0.93,'#1565C0'],[0.22,0.97,'#F57F17'],[0.78,0.97,'#2E7D32']].forEach(([px,py,col])=>{
+    mushroom(W*px,bT+bH*py,cell*0.9,col);
+  });
+
+  // Fireflies
+  const ffPos=[[0.06,0.75],[0.14,0.68],[0.85,0.72],[0.93,0.65],[0.18,0.82],[0.82,0.80],[0.10,0.55],[0.90,0.58]];
+  ffPos.forEach(([px,py])=>{
+    ctx.save(); ctx.shadowColor='#FECA57'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.arc(W*px,bT+bH*py,2,0,Math.PI*2);
+    ctx.fillStyle='rgba(254,202,87,0.8)'; ctx.fill(); ctx.restore();
+  });
+
+  // ── Tree structure ─────────────────────────────────────────────────────
+  // Trunk goes from bottom-center upward, bark-colored
+  function drawBranch(p1,p2,w,col,glowCol){
+    ctx.save(); ctx.shadowColor=glowCol; ctx.shadowBlur=w*1.2;
+    ctx.beginPath(); ctx.moveTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]);
+    ctx.strokeStyle=col; ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
+    ctx.restore();
+  }
+
+  // Trunk
+  const trunkSegs=[[pt(0.50,0.95),pt(0.50,0.88)],[pt(0.50,0.88),pt(0.50,0.82)],[pt(0.50,0.82),pt(0.50,0.76)],[pt(0.50,0.76),pt(0.50,0.70)]];
+  trunkSegs.forEach(([a,b])=>drawBranch(a,b,cell*2.8,'#5D4037','#FECA57'));
+
+  // Main fork at trunk top → L, C, R branches
+  const trunkTop=pt(0.50,0.70);
+  const LB_root=pt(0.32,0.62), CB_root=pt(0.50,0.62), RB_root=pt(0.68,0.62);
+  [LB_root,CB_root,RB_root].forEach(p=>drawBranch(trunkTop,p,cell*2.0,'#6D4C41','#FECA57'));
+
+  // Left branch
+  const LB=[pt(0.24,0.55),pt(0.17,0.47),pt(0.14,0.40),pt(0.15,0.33)];
+  let prev=LB_root; LB.forEach(p=>{drawBranch(prev,p,cell*1.5,'#5D4037','#FF9F43'); prev=p;});
+  // LL sub
+  const LL=[pt(0.08,0.26),pt(0.06,0.18),pt(0.10,0.11)];
+  drawBranch(LB[LB.length-1],LL[0],cell*1.0,'#4E342E','#FF6B6B');
+  LL.forEach((p,i)=>{ if(i>0)drawBranch(LL[i-1],p,cell*0.9,'#4E342E','#FF6B6B'); });
+  // LR sub
+  const LR=[pt(0.23,0.26),pt(0.25,0.18),pt(0.22,0.11)];
+  drawBranch(LB[LB.length-1],LR[0],cell*1.0,'#4E342E','#FECA57');
+  LR.forEach((p,i)=>{ if(i>0)drawBranch(LR[i-1],p,cell*0.9,'#4E342E','#FECA57'); });
+
+  // Center branch
+  const CB=[pt(0.50,0.55),pt(0.50,0.47),pt(0.50,0.40),pt(0.50,0.33)];
+  prev=CB_root; CB.forEach(p=>{drawBranch(prev,p,cell*1.5,'#4E342E','#48DBFB'); prev=p;});
+  const CL=[pt(0.40,0.26),pt(0.38,0.18),pt(0.40,0.11)];
+  drawBranch(CB[CB.length-1],CL[0],cell*1.0,'#3E2723','#FF9FF3');
+  CL.forEach((p,i)=>{ if(i>0)drawBranch(CL[i-1],p,cell*0.9,'#3E2723','#FF9FF3'); });
+  const CR=[pt(0.60,0.26),pt(0.62,0.18),pt(0.60,0.11)];
+  drawBranch(CB[CB.length-1],CR[0],cell*1.0,'#3E2723','#54A0FF');
+  CR.forEach((p,i)=>{ if(i>0)drawBranch(CR[i-1],p,cell*0.9,'#3E2723','#54A0FF'); });
+
+  // Right branch
+  const RB=[pt(0.76,0.55),pt(0.83,0.47),pt(0.86,0.40),pt(0.85,0.33)];
+  prev=RB_root; RB.forEach(p=>{drawBranch(prev,p,cell*1.5,'#5D4037','#FF9F43'); prev=p;});
+  const RL=[pt(0.77,0.26),pt(0.75,0.18),pt(0.78,0.11)];
+  drawBranch(RB[RB.length-1],RL[0],cell*1.0,'#4E342E','#48DBFB');
+  RL.forEach((p,i)=>{ if(i>0)drawBranch(RL[i-1],p,cell*0.9,'#4E342E','#48DBFB'); });
+  const RR=[pt(0.92,0.26),pt(0.94,0.18),pt(0.90,0.11)];
+  drawBranch(RB[RB.length-1],RR[0],cell*1.0,'#4E342E','#FF6B6B');
+  RR.forEach((p,i)=>{ if(i>0)drawBranch(RR[i-1],p,cell*0.9,'#4E342E','#FF6B6B'); });
+
+  // All tips → canopy
+  const canopy=pt(0.50,0.06);
+  const castle=pt(0.50,0.01);
+  [LL,LR,CL,CR,RL,RR].forEach(br=>{
+    const tip=br[br.length-1];
+    ctx.save(); ctx.shadowColor='rgba(254,202,87,0.5)'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.moveTo(tip[0],tip[1]); ctx.lineTo(canopy[0],canopy[1]);
+    ctx.strokeStyle='rgba(254,202,87,0.4)'; ctx.lineWidth=cell*0.9; ctx.lineCap='round'; ctx.stroke();
+    ctx.restore();
+  });
+  drawBranch(canopy,castle,cell*1.8,'#FECA57','#FECA57');
+
+  // Sparkle Bridge shortcut: LB[3] → RB[3]
+  const bridgeL=LB[3], bridgeR=RB[3];
+  ctx.save(); ctx.shadowColor='#FF9FF3'; ctx.shadowBlur=10;
+  ctx.setLineDash([cell*0.9,cell*0.4]);
+  ctx.beginPath(); ctx.moveTo(bridgeL[0],bridgeL[1]); ctx.lineTo(bridgeR[0],bridgeR[1]);
+  ctx.strokeStyle='rgba(255,159,243,0.8)'; ctx.lineWidth=cell*1.1; ctx.lineCap='round'; ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+  label(ctx,(bridgeL[0]+bridgeR[0])/2,(bridgeL[1]+bridgeR[1])/2-cell*1.2,'✨ Sparkle Bridge','#FF9FF3',cell*0.58);
+
+  // Leaves (scattered)
+  const leafPos=[[0.18,0.50],[0.82,0.51],[0.10,0.38],[0.90,0.37],[0.28,0.22],[0.72,0.23],[0.42,0.15],[0.58,0.14],[0.16,0.30],[0.84,0.31]];
+  ctx.save(); ctx.globalAlpha=0.5;
+  leafPos.forEach(([px,py])=>{ ctx.font=`${cell*0.7}px serif`; ctx.textAlign='center'; ctx.fillText('🍃',W*px,bT+bH*py); });
+  ctx.restore();
+
+  // Title
+  ctx.textAlign='center'; ctx.save(); ctx.shadowColor='#FECA57'; ctx.shadowBlur=16;
+  ctx.font=`bold ${W*0.058}px -apple-system,sans-serif`;
+  ctx.fillStyle='#FECA57'; ctx.fillText('🦄 Unicorn Jellybean Woods', W/2, bT-16); ctx.restore();
+
+  // ── Jellybean spaces ───────────────────────────────────────────────────
+  const rw=cell*1.1, rh=cell*0.68;
+  function jb(p,col,icon,glowCol=null){
+    if(glowCol){ctx.save();ctx.shadowColor=glowCol;ctx.shadowBlur=16;}
+    ctx.save(); ctx.translate(p[0],p[1]); ctx.rotate(-0.3);
+    ctx.beginPath(); ctx.ellipse(rw*0.08,rh*0.12,rw,rh,0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0,0,rw,rh,0,0,Math.PI*2); ctx.fillStyle=col; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0,0,rw*0.74,rh*0.74,0,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.88)'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0,0,rw*0.60,rh*0.60,0,0,Math.PI*2); ctx.fillStyle=lighten(col,0.42); ctx.fill();
+    ctx.restore();
+    if(glowCol)ctx.restore();
+    if(icon){ctx.textAlign='center';ctx.font=`${rh*0.9}px serif`;ctx.fillText(icon,p[0],p[1]+rh*0.35);}
+  }
+
+  // Trunk spaces
+  const trunkSpaces=[pt(0.50,0.95),pt(0.50,0.88),pt(0.50,0.82),pt(0.50,0.76)];
+  trunkSpaces.forEach((p,i)=>jb(p,PAL[i%6],i===0?'🌟':null,i===0?'#FECA57':null));
+
+  // Fork space
+  jb(trunkTop,'#FF9F43','⑂','#FECA57');
+  forkRing(ctx,trunkTop[0],trunkTop[1],rw*1.1,cell);
+
+  // Branch spaces
+  [LB_root,CB_root,RB_root].forEach((p,i)=>jb(p,PAL[(i*2)%6],'⑂'));
+  LB.forEach((p,i)=>{ const isF=i===LB.length-1; jb(p,PAL[(i+1)%6],isF?'⑂':i===1?'🍯':null); if(isF)forkRing(ctx,p[0],p[1],rw,cell); });
+  CB.forEach((p,i)=>{ const isF=i===CB.length-1; const isLM=i===2;
+    jb(p,PAL[(i+2)%6],isLM?'🌈':isF?'⑂':null,isLM?PAL[2]:null); if(isF)forkRing(ctx,p[0],p[1],rw,cell); });
+  if(CB[2]) label(ctx,CB[2][0]+cell*2.8,CB[2][1],'Rainbow Glade',PAL[3],cell*0.6);
+  RB.forEach((p,i)=>{ const isF=i===RB.length-1; jb(p,PAL[(i+3)%6],isF?'⑂':i===2?'🍯':null); if(isF)forkRing(ctx,p[0],p[1],rw,cell); });
+
+  // Sub-branches
+  [...LL,...LR,...CL,...CR,...RL,...RR].forEach((p,i)=>jb(p,PAL[i%6],null));
+
+  // Canopy (Cloud Cake)
+  jb(canopy,'#FFCC02','☁️','#FECA57');
+  forkRing(ctx,canopy[0],canopy[1],rw*1.3,cell);
+  label(ctx,canopy[0],canopy[1]-rw*1.8,'Cloud Cake','#FECA57',cell*0.65);
+
+  // Castle
+  ctx.save(); ctx.shadowColor='#FECA57'; ctx.shadowBlur=cell*3;
+  space(ctx,castle[0],castle[1],cell*2.0,'#FFCC00','🏰','#FFCC00'); ctx.restore();
+  label(ctx,castle[0],castle[1]-cell*2.8,'Crown Castle','#FECA57',cell*0.72);
+
+  // Player token on right branch
+  token(ctx,RB[1][0],RB[1][1],cell,'🦄','#FF9FF3');
+}
+
+// ═══════════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════════
+const FNS={a:drawA,b:drawB,c:drawC,d:drawD};
+const drawn={};
+
+function switchTab(id){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(!drawn[id]){ FNS[id](); drawn[id]=true; }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+window.addEventListener('load',()=>{ drawA(); drawn.a=true; });
+window.addEventListener('resize',()=>{ Object.keys(drawn).forEach(k=>FNS[k]()); });
 </script>
 </body>
 </html>

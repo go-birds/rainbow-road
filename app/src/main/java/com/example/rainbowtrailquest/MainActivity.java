@@ -82,9 +82,12 @@ public class MainActivity extends Activity {
 
         private GameEngine engine = new GameEngine();
         private int eggSparkles = 0;
+        private int layoutIndex = 0;
         private final RectF drawCardRect = new RectF();
         private final Path roadPath = new Path();
-        private final Path arrowPath = new Path();
+        // fork-choice UI hit targets
+        private final List<RectF> branchButtonRects = new ArrayList<>();
+        private final List<Integer> branchButtonIds = new ArrayList<>();
 
         GameView(Context ctx, StatusSink sink, SummarySink summary) {
             super(ctx);
@@ -93,14 +96,24 @@ public class MainActivity extends Activity {
         }
 
         void newGame() {
-            engine.newGame();
+            // cycle through the branching boards, then the classic board
+            engine.newGame(GameEngine.LAYOUTS[layoutIndex % GameEngine.LAYOUTS.length]);
+            layoutIndex++;
             statusSink.set(engine.getLastCard());
             updateSummary();
             invalidate();
         }
 
         void drawCard() {
-            if (engine.isWon()) engine.newGame(); else engine.drawCard();
+            if (engine.isBranchPending()) return;            // resolve the fork on the board first
+            if (engine.isWon()) newGame(); else engine.drawCard();
+            statusSink.set(engine.getLastCard());
+            updateSummary();
+            invalidate();
+        }
+
+        void chooseBranch(int nextId) {
+            engine.chooseBranch(nextId);
             statusSink.set(engine.getLastCard());
             updateSummary();
             invalidate();
@@ -122,12 +135,13 @@ public class MainActivity extends Activity {
             summarySink.set(s);
         }
 
-        // Maps space index to canvas position: start at bottom, castle at top, sinusoidal winding
-        private PointF spaceCenter(int i, int n, float w, float h) {
-            float boardTop = 108f, boardBottom = h - 140f;
-            float t = (float) i / Math.max(n - 1, 1);
-            float y = boardBottom - t * (boardBottom - boardTop);
-            float x = w / 2f + w * 0.32f * (float) Math.sin(t * Math.PI * 4.5f);
+        // Maps a space to canvas position using its normalized board coordinates.
+        // py = 0 is the top (castle), py = 1 is the bottom (start).
+        private PointF spaceCenter(int i, float w, float h) {
+            GameEngine.Space s = engine.getBoard().get(i);
+            float boardTop = 112f, boardBottom = h - 150f;
+            float x = s.px * w;
+            float y = boardTop + s.py * (boardBottom - boardTop);
             return new PointF(x, y);
         }
 
@@ -147,7 +161,8 @@ public class MainActivity extends Activity {
             float cell = Math.min(w, h) * 0.033f;
 
             drawBackground(canvas, w, h);
-            drawRoad(canvas, n, w, h, cell);
+            drawRoad(canvas, board, w, h, cell);
+            if (engine.isBranchPending()) drawBranchEdges(canvas, board, w, h, cell);
             drawSpaces(canvas, board, n, w, h, cell);
             drawPlayerToken(canvas, n, w, h, cell);
             drawCardPreview(canvas, w, h);
@@ -175,70 +190,88 @@ public class MainActivity extends Activity {
             c.drawText("Every path is a new adventure  ✨", w / 2f, 90f, paint);
         }
 
-        private void drawRoad(Canvas c, int n, float w, float h, float cell) {
-            // Build a smooth quadratic-bezier path through all space centers
-            PointF prev = spaceCenter(0, n, w, h);
+        private void drawRoad(Canvas c, List<GameEngine.Space> board, float w, float h, float cell) {
+            // One path over every graph edge (forks naturally diverge).
             roadPath.reset();
-            roadPath.moveTo(prev.x, prev.y);
-            for (int i = 1; i < n; i++) {
-                PointF curr = spaceCenter(i, n, w, h);
-                float mx = (prev.x + curr.x) / 2f, my = (prev.y + curr.y) / 2f;
-                roadPath.quadTo(prev.x, prev.y, mx, my);
-                prev = curr;
+            for (int i = 0; i < board.size(); i++) {
+                PointF a = spaceCenter(i, w, h);
+                for (int j : board.get(i).nextIds) {
+                    PointF b = spaceCenter(j, w, h);
+                    boolean dashed = board.get(i).shortcut && Math.abs(j - i) > 1;
+                    if (dashed) continue;   // shortcut chords drawn separately
+                    roadPath.moveTo(a.x, a.y);
+                    roadPath.lineTo(b.x, b.y);
+                }
             }
-            roadPath.lineTo(prev.x, prev.y);
-
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeJoin(Paint.Join.ROUND);
             paint.setStrokeCap(Paint.Cap.ROUND);
 
-            // Drop shadow
-            paint.setStrokeWidth(cell * 2.8f);
+            paint.setStrokeWidth(cell * 2.8f);   // shadow
             paint.setColor(0x22000000);
-            c.save();
-            c.translate(cell * 0.15f, cell * 0.22f);
-            c.drawPath(roadPath, paint);
-            c.restore();
+            c.save(); c.translate(cell * 0.12f, cell * 0.2f);
+            c.drawPath(roadPath, paint); c.restore();
 
-            // White outer road
-            paint.setStrokeWidth(cell * 2.5f);
+            paint.setStrokeWidth(cell * 2.5f);   // white border
             paint.setColor(0xFFFFFFFF);
             c.drawPath(roadPath, paint);
 
-            // Cream road surface
-            paint.setStrokeWidth(cell * 1.7f);
+            paint.setStrokeWidth(cell * 1.7f);   // cream surface
             paint.setColor(0xFFFEF6EC);
             c.drawPath(roadPath, paint);
 
-            // Direction arrows every ~10% of board length
-            paint.setStyle(Paint.Style.FILL);
-            int step = Math.max(3, n / 10);
-            for (int i = step; i < n - 1; i += step) {
-                drawArrow(c, spaceCenter(i, n, w, h), spaceCenter(i + 1, n, w, h), cell * 0.58f);
+            // dashed shortcut chords
+            roadPath.reset();
+            boolean any = false;
+            for (int i = 0; i < board.size(); i++) {
+                if (!board.get(i).shortcut) continue;
+                PointF a = spaceCenter(i, w, h);
+                for (int j : board.get(i).nextIds) {
+                    if (Math.abs(j - i) <= 1) continue;
+                    PointF b = spaceCenter(j, w, h);
+                    roadPath.moveTo(a.x, a.y); roadPath.lineTo(b.x, b.y); any = true;
+                }
+            }
+            if (any) {
+                paint.setStrokeWidth(cell * 0.7f);
+                paint.setColor(0xCCB98AD8);
+                paint.setPathEffect(new DashPathEffect(new float[]{cell * 0.9f, cell * 0.6f}, 0));
+                c.drawPath(roadPath, paint);
+                paint.setPathEffect(null);
             }
         }
 
-        private void drawArrow(Canvas c, PointF from, PointF to, float sz) {
-            float ang = (float) Math.atan2(to.y - from.y, to.x - from.x);
-            float mx = (from.x + to.x) / 2f, my = (from.y + to.y) / 2f;
-            arrowPath.reset();
-            arrowPath.moveTo(mx + sz * (float) Math.cos(ang),
-                             my + sz * (float) Math.sin(ang));
-            arrowPath.lineTo(mx + sz * 0.52f * (float) Math.cos(ang + 2.5f),
-                             my + sz * 0.52f * (float) Math.sin(ang + 2.5f));
-            arrowPath.lineTo(mx + sz * 0.52f * (float) Math.cos(ang - 2.5f),
-                             my + sz * 0.52f * (float) Math.sin(ang - 2.5f));
-            arrowPath.close();
-            paint.setColor(0x55B09ECC);
-            c.drawPath(arrowPath, paint);
+        // Highlight the diverging options at a pending fork.
+        private void drawBranchEdges(Canvas c, List<GameEngine.Space> board, float w, float h, float cell) {
+            int from = engine.getBranchNode();
+            if (from < 0) return;
+            PointF a = spaceCenter(from, w, h);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            for (int j : engine.getBranchOptions()) {
+                PointF b = spaceCenter(j, w, h);
+                paint.setStrokeWidth(cell * 2.0f);
+                paint.setColor(0xAA000000 | (baseColors[board.get(j).colorIndex] & 0xFFFFFF));
+                c.drawLine(a.x, a.y, b.x, b.y, paint);
+            }
         }
 
         private void drawSpaces(Canvas c, List<GameEngine.Space> board, int n, float w, float h, float cell) {
             for (int i = 0; i < n; i++) {
                 GameEngine.Space s = board.get(i);
-                PointF p = spaceCenter(i, n, w, h);
+                PointF p = spaceCenter(i, w, h);
                 int col = s.castle ? 0xFFFFCC00 : baseColors[s.colorIndex];
                 float r = spaceRadius(s, cell);
+
+                // Fork halo on branch spaces (gold dashed ring)
+                if (s.branch) {
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStrokeWidth(cell * 0.26f);
+                    paint.setColor(i == engine.getBranchNode() && engine.isBranchPending() ? 0xFFFFC400 : 0x88F4C95D);
+                    paint.setPathEffect(new DashPathEffect(new float[]{cell * 0.5f, cell * 0.34f}, 0));
+                    c.drawCircle(p.x, p.y, r + cell * 0.5f, paint);
+                    paint.setPathEffect(null);
+                }
 
                 // Drop shadow
                 paint.setStyle(Paint.Style.FILL);
@@ -274,12 +307,15 @@ public class MainActivity extends Activity {
                 } else if (s.specialName != null) {
                     paint.setTextSize(r * 0.92f);
                     c.drawText("✨", p.x, p.y + r * 0.33f, paint);
+                } else if (s.branch) {
+                    paint.setTextSize(r * 0.92f);
+                    c.drawText("🔀", p.x, p.y + r * 0.33f, paint);
                 }
             }
         }
 
         private void drawPlayerToken(Canvas c, int n, float w, float h, float cell) {
-            PointF p = spaceCenter(engine.getPlayerPosition(), n, w, h);
+            PointF p = spaceCenter(engine.getPlayerPosition(), w, h);
             float r = cell * 1.18f;
 
             // Outer glow rings
@@ -307,6 +343,7 @@ public class MainActivity extends Activity {
         }
 
         private void drawCardPreview(Canvas c, float w, float h) {
+            if (engine.isBranchPending()) { drawBranchChoice(c, w, h); return; }
             String lastCard = engine.getLastCard();
             float cardH = 108f;
             float cardTop = h - cardH - 10f;
@@ -339,6 +376,62 @@ public class MainActivity extends Activity {
             c.drawText(display, w / 2f, cardTop + cardH * 0.62f, paint);
         }
 
+        private void drawBranchChoice(Canvas c, float w, float h) {
+            branchButtonRects.clear();
+            branchButtonIds.clear();
+            List<Integer> opts = engine.getBranchOptions();
+            int from = engine.getBranchNode();
+            float gap = 10f;
+            float btnH = 66f;
+            float promptH = 30f;
+            float panelH = promptH + btnH + 20f;
+            float top = h - panelH - 10f;
+
+            // prompt
+            paint.setStyle(Paint.Style.FILL);
+            paint.setFakeBoldText(true);
+            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setTextSize(24f);
+            paint.setColor(0xFFB8860B);
+            c.drawText("🔀 Choose your path!", w / 2f, top + promptH * 0.8f, paint);
+            paint.setFakeBoldText(false);
+
+            float btnTop = top + promptH + 6f;
+            int k = opts.size();
+            float btnW = (w - 32f - gap * (k - 1)) / k;
+            List<GameEngine.Space> board = engine.getBoard();
+            for (int idx = 0; idx < k; idx++) {
+                int nextId = opts.get(idx);
+                GameEngine.Space ns = board.get(nextId);
+                float left = 16f + idx * (btnW + gap);
+                RectF r = new RectF(left, btnTop, left + btnW, btnTop + btnH);
+                branchButtonRects.add(r);
+                branchButtonIds.add(nextId);
+
+                int col = ns.castle ? 0xFFFFCC00 : baseColors[ns.colorIndex];
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(col);
+                c.drawRoundRect(r, 16f, 16f, paint);
+                paint.setColor(lighten(col, 0.5f));
+                c.drawRoundRect(new RectF(r.left + 3, r.top + 3, r.right - 3, r.top + btnH * 0.5f), 14f, 14f, paint);
+
+                // label: landmark name, or direction + colour
+                String label;
+                if (ns.specialName != null) label = ns.specialName;
+                else {
+                    String dir = k == 2 ? (ns.px < board.get(from).px ? "Left" : "Right")
+                                        : (ns.px < 0.4f ? "Left" : ns.px > 0.6f ? "Right" : "Center");
+                    label = dir;
+                }
+                paint.setColor(0xFF3A2A1A);
+                paint.setFakeBoldText(true);
+                paint.setTextSize(label.length() > 10 ? 18f : 22f);
+                String disp = label.length() > 16 ? label.substring(0, 15) + "…" : label;
+                c.drawText(disp, r.centerX(), r.centerY() + 8f, paint);
+                paint.setFakeBoldText(false);
+            }
+        }
+
         private void drawEggs(Canvas c, float w) {
             if (eggSparkles <= 0) return;
             paint.setStyle(Paint.Style.FILL);
@@ -359,6 +452,18 @@ public class MainActivity extends Activity {
         @Override public boolean onTouchEvent(MotionEvent e) {
             if (e.getAction() != MotionEvent.ACTION_DOWN) return true;
             float x = e.getX(), y = e.getY();
+
+            // fork choice takes priority while a branch is pending
+            if (engine.isBranchPending()) {
+                for (int i = 0; i < branchButtonRects.size(); i++) {
+                    if (branchButtonRects.get(i).contains(x, y)) {
+                        chooseBranch(branchButtonIds.get(i));
+                        return true;
+                    }
+                }
+                return true;
+            }
+
             if (drawCardRect.contains(x, y)) { drawCard(); return true; }
             if (y < 100f) {
                 eggSparkles = (eggSparkles + 1) % 8;
@@ -371,7 +476,7 @@ public class MainActivity extends Activity {
             float w = getWidth(), h = getHeight();
             float cell = Math.min(w, h) * 0.033f;
             for (int i = 0; i < n; i++) {
-                PointF p = spaceCenter(i, n, w, h);
+                PointF p = spaceCenter(i, w, h);
                 float r = spaceRadius(board.get(i), cell);
                 if (Math.hypot(x - p.x, y - p.y) <= r * 1.2f) {
                     GameEngine.Space s = board.get(i);
